@@ -21,11 +21,11 @@ type (
 	}
 
 	Task struct {
-		TaskID      string `json:"task_id,omitempty" :"taskID"`
-		TaskName    string `json:"name"  validate:"required" :"taskName"`
-		Description string `json:"description"  validate:"required" :"description"`
+		TaskID      string `json:"task_id,omitempty"`
+		TaskName    string `json:"name"  validate:"required"`
+		Description string `json:"description"  validate:"required"`
 		Price       string `json:"price" validate:"required"`
-		UploadedAt  string `json:"created,omitempty" :"uploadedAt"`
+		UploadedAt  string `json:"created,omitempty"`
 	}
 )
 
