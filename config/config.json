@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "Prove"
+  },
+  "http": {
+    "enable_https": false,
+    "trusted_subnet": "10.0.0.1/8",
+    "resolve_ip_using_header": false,
+    "base_url": "http://localhost:8080",
+    "accrual": "http://localhost:8088",
+    "server_address": "localhost:8080",
+    "server_domain": "rooder.ru",
+    "certs_dir": "certs"
+  },
+  "storage": {
+    "file_storage": "storage.txt",
+    "connect_db": ""
+  },
+  "cookie": {
+    "secret_key": "erter09gj0f9g",
+    "access_token_name": "access_token"
+  },
+  "jwt": {
+    "secret": "werwtt12_ddd_123",
+    "hash_salt": "werwtt12_ddd_123"
+  },
+  "log": {
+    "log_level": "debug"
+  },
+  "grpc": {
+    "port": "8085",
+    "host": "localhost"
+  }
+}

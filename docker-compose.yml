@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  db:
+    hostname: postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=bob
+      - POSTGRES_PASSWORD=mypasswd
+      - POSTGRES_DB=prove
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+    networks:
+      - mynet
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_PLUGINS: "tables-filter tinymce"
+      ADMINER_DEFAULT_SERVER: "postgres"
+    #      ADMINER_DESIGN: "nette"
+    ports:
+      - "8077:8080"
+    networks:
+      - mynet
+  prove:
+    image: setter2000/prove:0.5.0
+    environment:
+      DATABASE_URI: "postgres://bob:mypasswd@postgres:5432/prove?sslmode=disable"
+    container_name: "prove-serve"
+    command: ./prove-server -s
+    ports:
+      - "443:443"
+    restart: always
+    networks:
+      - mynet
+volumes:
+  indra-data:
+networks:
+  mynet:
+    driver: bridge
