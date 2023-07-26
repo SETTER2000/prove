@@ -28,8 +28,7 @@ type (
 
 func (c *Card) Validate() error {
 	return validation.ValidateStruct(
-		c,
-		validation.Field(&c.Number, validation.Required),
+		c, validation.Field(&c.Number, validation.Required),
 		//validation.Field(&c.Number, validation.By(requiredIf(c.EncryptPassword == "")), validation.Length(1, 64)),
 	)
 	//return validation.ValidateStruct(a, validation.Field(&a.Email, validation.Required, is.Email))

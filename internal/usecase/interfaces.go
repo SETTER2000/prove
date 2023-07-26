@@ -15,6 +15,10 @@ type (
 	// Prove -.
 	// Post -.
 	Prove interface {
+		SaveGroup(context.Context, *entity.Group) error
+		GroupList(context.Context) (*entity.GroupList, error)
+		SaveTask(context.Context, *entity.Task) error
+		TaskList(context.Context) (*entity.TaskList, error)
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
@@ -29,6 +33,10 @@ type (
 
 	// ProveRepo -.
 	ProveRepo interface {
+		SaveGroup(context.Context, *entity.Group) error
+		GroupList(context.Context) (*entity.GroupList, error)
+		SaveTask(context.Context, *entity.Task) error
+		TaskList(context.Context) (*entity.TaskList, error)
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
@@ -36,7 +44,7 @@ type (
 		Registry(context.Context, *entity.Authentication) error
 		GetByLogin(context.Context, string) (*entity.Authentication, error)
 		GetByID(context.Context, string) (*entity.Authentication, error)
-		// Post от shorturl
+
 		Post(context.Context, *entity.Prove) error
 		Put(context.Context, *entity.Prove) error
 		Get(context.Context, *entity.Prove) (*entity.Prove, error)

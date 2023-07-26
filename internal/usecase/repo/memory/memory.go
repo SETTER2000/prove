@@ -31,6 +31,20 @@ func (s *Memory) SaveText(context.Context, *entity.Text) error {
 func (s *Memory) SavePass(context.Context, *entity.Pass) error {
 	return nil
 }
+func (s *Memory) SaveGroup(ctx context.Context, c *entity.Group) error {
+	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
+}
+
+func (s *Memory) GroupList(context.Context) (*entity.GroupList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+func (s *Memory) SaveTask(ctx context.Context, c *entity.Task) error {
+	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
+}
+func (s *Memory) TaskList(context.Context) (*entity.TaskList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+
 func (s *Memory) SaveCard(context.Context, *entity.Card) error {
 	return nil
 }

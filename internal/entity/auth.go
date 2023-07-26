@@ -14,6 +14,11 @@ type (
 		Login           string `json:"login"  validate:"required"`
 		Password        string `json:"password,omitempty"`
 		EncryptPassword string `json:"-"`
+		Surname         string `json:"surname"`
+		Name            string `json:"name"`
+		Patronymic      string `json:"patronymic"`
+		Email           string `json:"email"`
+		GroupID         string `json:"group_id"`
 	}
 
 	Data struct{}

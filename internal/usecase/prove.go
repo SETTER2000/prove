@@ -67,6 +67,33 @@ func (uc *ProveUseCase) SaveText(ctx context.Context, c *entity.Text) error {
 	}
 	return nil
 }
+func (uc *ProveUseCase) SaveGroup(ctx context.Context, c *entity.Group) error {
+	err := c.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = uc.repo.SaveGroup(ctx, c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SaveTask создать задачу
+func (uc *ProveUseCase) SaveTask(ctx context.Context, c *entity.Task) error {
+	err := c.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = uc.repo.SaveTask(ctx, c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (uc *ProveUseCase) SaveCard(ctx context.Context, c *entity.Card) error {
 	err := c.Validate()
 	if err != nil {
@@ -110,6 +137,24 @@ func (uc *ProveUseCase) ShortLink(ctx context.Context, ind *entity.Prove) (*enti
 // CardListUserID возвращает все сохранённые карты пользователя
 func (uc *ProveUseCase) CardListUserID(ctx context.Context, u *entity.User) (*entity.CardList, error) {
 	ol, err := uc.repo.CardListGetUserID(ctx, u)
+	if err == nil {
+		return ol, nil
+	}
+	return nil, ErrBadRequest
+}
+
+// GroupList возвращает список групп
+func (uc *ProveUseCase) GroupList(ctx context.Context) (*entity.GroupList, error) {
+	ol, err := uc.repo.GroupList(ctx)
+	if err == nil {
+		return ol, nil
+	}
+	return nil, ErrBadRequest
+}
+
+// TaskList возвращает список задач
+func (uc *ProveUseCase) TaskList(ctx context.Context) (*entity.TaskList, error) {
+	ol, err := uc.repo.TaskList(ctx)
 	if err == nil {
 		return ol, nil
 	}

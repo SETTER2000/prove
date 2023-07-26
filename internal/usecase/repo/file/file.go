@@ -214,6 +214,18 @@ func (i *InFiles) SavePass(context.Context, *entity.Pass) error {
 func (i *InFiles) SaveText(context.Context, *entity.Text) error {
 	return nil
 }
+func (i *InFiles) SaveGroup(ctx context.Context, c *entity.Group) error {
+	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
+}
+func (i *InFiles) GroupList(context.Context) (*entity.GroupList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+func (i *InFiles) SaveTask(ctx context.Context, c *entity.Task) error {
+	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
+}
+func (i *InFiles) TaskList(context.Context) (*entity.TaskList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
 func (i *InFiles) SaveCard(context.Context, *entity.Card) error {
 	return nil
 }

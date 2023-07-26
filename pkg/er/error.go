@@ -24,6 +24,8 @@ var (
 	ErrStatusConflict           = errors.New("status conflict")
 	ErrStatusGone               = errors.New("status gone")
 	ErrValidCard                = errors.New("not a valid card")
+	ErrValidGroup               = errors.New("not a valid group")
+	ErrValidTask                = errors.New("not a valid task")
 	ErrInsufficientFundsAccount = errors.New("insufficient funds in the account")
 	ErrAlreadyBeenUploaded      = errors.New("the order number has already been uploaded by another user")
 	ErrNotDataAnswer            = errors.New("no data to answer")

@@ -56,7 +56,6 @@ func PortGRPC() Option {
 // EnableHTTPS - опция подключает возможность использования SSL/TLS на сервере.
 func EnableHTTPS() Option {
 	cfg := config.GetConfig().HTTP
-	fmt.Printf("TLS cert. ServerDomain: %s\n", config.GetConfig().ServerDomain)
 	fmt.Printf("CONNECT DB DSN: %s\n", config.GetConfig().ConnectDB)
 	// конструируем менеджер TLS-сертификатов
 	manager := &autocert.Manager{

@@ -61,9 +61,14 @@ func (i *InSQL) Registry(ctx context.Context, a *entity.Authentication) error {
 		return err
 	}
 	err := i.w.db.QueryRow(
-		"INSERT INTO public.user(login, encrypted_passwd) VALUES ($1,$2) RETURNING user_id",
+		"INSERT INTO public.user(login, encrypted_passwd,email, surname, name,patronymic, group_id, uploaded_at) VALUES ($1,$2,$3,$4,$5,$6,$7,now()) RETURNING user_id",
 		a.Login,
 		a.EncryptPassword,
+		a.Email,
+		a.Surname,
+		a.Name,
+		a.Patronymic,
+		a.GroupID,
 	).Scan(&a.ID)
 	if err, ok := err.(*pgconn.PgError); ok {
 		if err.Code == pgerrcode.UniqueViolation {
@@ -125,6 +130,36 @@ func (i *InSQL) SavePass(ctx context.Context, c *entity.Pass) error {
 
 	return tx.Commit()
 
+}
+
+func (i *InSQL) SaveGroup(ctx context.Context, c *entity.Group) error {
+	err := i.w.db.QueryRow(
+		"INSERT INTO public.group(group_name, uploaded_at) VALUES ($1,now()) RETURNING group_name",
+		c.GroupName,
+	).Scan(&c.GroupName)
+	if err, ok := err.(*pgconn.PgError); ok {
+		if err.Code == pgerrcode.UniqueViolation {
+			return er.NewConflictError("", "", er.ErrAlreadyExists)
+		}
+	}
+
+	return nil
+}
+
+func (i *InSQL) SaveTask(ctx context.Context, c *entity.Task) error {
+	err := i.w.db.QueryRow(
+		"INSERT INTO public.task(task_name, description,price, uploaded_at) VALUES ($1,$2,$3, now()) RETURNING task_name",
+		c.TaskName,
+		c.Description,
+		c.Price,
+	).Scan(&c.TaskName)
+	if err, ok := err.(*pgconn.PgError); ok {
+		if err.Code == pgerrcode.UniqueViolation {
+			return er.NewConflictError("", "", er.ErrAlreadyExists)
+		}
+	}
+
+	return nil
 }
 
 func (i *InSQL) SaveCard(ctx context.Context, c *entity.Card) error {
@@ -269,6 +304,72 @@ func (i *InSQL) GetByID(ctx context.Context, l string) (*entity.Authentication, 
 	return &a, nil
 }
 
+// GroupList  вернёт список групп
+func (i *InSQL) GroupList(ctx context.Context) (*entity.GroupList, error) {
+	var grupID, groupName, uploadedAt string
+
+	q := `SELECT group_id, group_name, uploaded_at FROM "group" ORDER BY group_name`
+	rows, err := i.w.db.Queryx(q)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	or := entity.GroupList{}
+	ol := entity.Group{}
+	for rows.Next() {
+		err = rows.Scan(&grupID, &groupName, &uploadedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		ol.GroupName = groupName
+		ol.GroupID = grupID
+		ol.UploadedAt = uploadedAt
+		or = append(or, ol)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &or, nil
+}
+
+// TaskList вернёт список задач
+func (i *InSQL) TaskList(ctx context.Context) (*entity.TaskList, error) {
+	var taskID, taskName, description, price, uploadedAt string
+
+	q := `SELECT task_id, task_name, description,price, uploaded_at FROM "task" ORDER BY task_name`
+	rows, err := i.w.db.Queryx(q)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	or := entity.TaskList{}
+	ol := entity.Task{}
+	for rows.Next() {
+		err = rows.Scan(&taskID, &taskName, &description, &price, &uploadedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		ol.TaskName = taskName
+		ol.TaskID = taskID
+		ol.Description = description
+		ol.Price = price
+		ol.UploadedAt = uploadedAt
+		or = append(or, ol)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &or, nil
+}
+
 // CardListGetUserID  вернуть список карт по UserID
 func (i *InSQL) CardListGetUserID(ctx context.Context, u *entity.User) (*entity.CardList, error) {
 	var number, userID, uploadedAt, metaData string
@@ -331,14 +432,39 @@ func NewDB() (*sqlx.DB, error) {
 	db.SetMaxOpenConns(n)
 	schema := `
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE TABLE IF NOT EXISTS public.user
+    
+CREATE TABLE IF NOT EXISTS public.group
 (
-	user_id UUID NOT NULL DEFAULT uuid_generate_v1(),
-  CONSTRAINT user_id_user PRIMARY KEY (user_id),
-    login VARCHAR(100) NOT NULL UNIQUE,
-    encrypted_passwd VARCHAR(100) NOT NULL
+    group_id          UUID   NOT NULL DEFAULT uuid_generate_v1(),
+    CONSTRAINT group_id_group PRIMARY KEY (group_id),
+    group_name        VARCHAR(100) NOT NULL UNIQUE,
+    uploaded_at TIMESTAMP(0) WITH TIME ZONE
 );
 
+CREATE TABLE IF NOT EXISTS public.user
+(
+    user_id          UUID  NOT NULL DEFAULT uuid_generate_v1(),
+    CONSTRAINT user_id_user PRIMARY KEY (user_id),
+    login            VARCHAR(100) NOT NULL UNIQUE,
+    encrypted_passwd VARCHAR(100) NOT NULL,
+    email VARCHAR (100) NOT NULL,
+    surname VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    patronymic VARCHAR(100) NOT NULL,
+    group_id uuid,
+    foreign key (group_id) references public."group" (group_id)
+        match simple on update no action on delete no action,
+    uploaded_at TIMESTAMP(0) WITH TIME ZONE
+);
+CREATE TABLE IF NOT EXISTS public.task
+(
+    task_id          UUID   NOT NULL DEFAULT uuid_generate_v1(),
+    CONSTRAINT task_id_task PRIMARY KEY (task_id),
+    task_name        VARCHAR(100) NOT NULL UNIQUE,
+    description        TEXT NOT NULL,
+    price       MONEY NOT NULL,
+    uploaded_at TIMESTAMP(0) WITH TIME ZONE
+);
 CREATE TABLE IF NOT EXISTS public.card
 (
     number      NUMERIC PRIMARY KEY,

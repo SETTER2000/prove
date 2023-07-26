@@ -23,24 +23,11 @@ import (
 	"time"
 )
 
-//type ServerHandler struct {
-//	services usecase.IService
-//}
-//
-//func NewServerHandler(services usecase.IService) *ServerHandler {
-//	return &ServerHandler{services: services}
-//}
-
-//	type ServerHandler struct {
-//		services *service.Service
-//	}
 type ServerHandler struct {
 	s   usecase.Prove
 	l   logger.Logger
 	cfg *config.Config
 }
-
-//func NewServerHandler(services *service.Service) *ServerHandler {
 
 func NewServerHandler(s usecase.Prove) *ServerHandler {
 	return &ServerHandler{
@@ -71,8 +58,6 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 	router.Use(middleware.Recoverer)
 	router.Use(render.SetContentType(render.ContentTypePlainText))
 	router.Use(encrypt.EncryptionKeyCookie)
-	//router.Use(encrypt.EncryptionCookie(cfg))
-	//router.Use(encrypt.EncryptionJWT())
 	router.Use(gzip.DeCompressGzip)
 	router.Mount("/debug", middleware.Profiler())
 
@@ -83,6 +68,11 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 
 	h := router.Route("/api", func(r chi.Router) { r.Routes() })
 	{
+		h.Post("/group", sh.hGroup)
+		h.Get("/group", sh.hGroups)
+		h.Post("/task", sh.hTask)
+		h.Get("/task", sh.hTasks)
+
 		h.Post("/card", sh.hCard)
 		h.Get("/card", sh.hCards)
 		h.Post("/pass", sh.hPass)
@@ -92,7 +82,6 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 			r.Post("/register", sh.handleUserCreate)
 			r.Post("/login", sh.handleUserLogin)
 		})
-
 	}
 
 	root := router.Route("/", func(r chi.Router) { r.Routes() })
@@ -101,6 +90,76 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 	}
 
 	return router
+}
+
+// @Summary     Return JSON empty
+// @Description Save data task
+// @ID          Создание задачи.
+// @Tags  	    prove
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — данные успешно сохранены
+// @Failure     400 {object} response — неверный формат запроса
+// @Failure     409 {object} response — имя уже занято
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /task [post]
+func (sh *ServerHandler) hTask(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	c := &entity.Task{}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &c); err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	err = sh.s.SaveTask(ctx, c)
+	if err != nil {
+		if errors.Is(err, er.ErrAlreadyExists) {
+			sh.error(w, r, http.StatusConflict, err)
+			return
+		}
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	sh.respond(w, r, http.StatusOK, c)
+}
+
+// @Summary     Return JSON empty
+// @Description Save data group
+// @ID          Создание группы.
+// @Tags  	    prove
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — данные успешно сохранены
+// @Failure     400 {object} response — неверный формат запроса
+// @Failure     409 {object} response — имя уже занято
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /group [post]
+func (sh *ServerHandler) hGroup(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	c := &entity.Group{}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &c); err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	err = sh.s.SaveGroup(ctx, c)
+	if err != nil {
+		if errors.Is(err, er.ErrAlreadyExists) {
+			sh.error(w, r, http.StatusConflict, err)
+			return
+		}
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	sh.respond(w, r, http.StatusOK, c)
 }
 
 // @Summary     Return JSON empty
@@ -345,6 +404,56 @@ func (sh *ServerHandler) handleUserLogin(w http.ResponseWriter, r *http.Request)
 	}
 	sh.SessionCreated(w, r, u.ID)
 	sh.respond(w, r, http.StatusOK, nil)
+}
+
+// @Summary     Return JSON empty
+// @Description Получить список
+// @ID          hTasks
+// @Tags  	    prove-server
+// @Accept      text
+// @Produce     text
+// @Success     200 {object} response — успешная обработка запроса
+// @Success     204 {object} response — нет данных для ответ
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /task [get]
+func (sh *ServerHandler) hTasks(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ol, err := sh.s.TaskList(ctx)
+	if err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+	}
+
+	if len(*ol) < 1 {
+		sh.respond(w, r, http.StatusNoContent, "нет данных для ответа")
+	}
+
+	sh.respond(w, r, http.StatusOK, ol)
+}
+
+// @Summary     Return JSON empty
+// @Description Получить список
+// @ID          hGroups
+// @Tags  	    prove-server
+// @Accept      text
+// @Produce     text
+// @Success     200 {object} response — успешная обработка запроса
+// @Success     204 {object} response — нет данных для ответ
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /group [get]
+func (sh *ServerHandler) hGroups(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ol, err := sh.s.GroupList(ctx)
+	if err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+	}
+
+	if len(*ol) < 1 {
+		sh.respond(w, r, http.StatusNoContent, "нет данных для ответа")
+	}
+
+	sh.respond(w, r, http.StatusOK, ol)
 }
 
 // @Summary     Return JSON empty

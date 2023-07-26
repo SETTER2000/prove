@@ -3,23 +3,70 @@
 Prove - REST API сервис предоставляет решения алгоритмических задач.
 
 
-## Запуск сервера из бинарника.
+## Запуск сервера.
 Обязательно указать DSN базы данных. Рекомендуется PostgreSQL. 
 Так же положить папку config/config.json рядом с бинарником.
 Если есть сервер удалённый можно запустить docker-compose.yml, 
 тем самым поднять DB Postgres и Adminer, в этом случаи adminer будет доступен по :8077
-* Можно подключиться к demo серверу сейчас так:
-* prove -d postgres://bob:mypasswd@194.67.104.167:5432/prove?sslmode=disable
 
-### Linux
-Подключение DB через флаг -d
-```
-./bin/prove_<здесь версия>_linux_amd6 -d postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
+### Подключить DB
+При запуске бинарника для флага -d указать ваш DSN
+```azure
+ prove_<version> -d <DSN>
 ```
 
-Возможно так же подключить DB через переменную окружения
+Подключить DB через переменную окружения
 ```
-DATABASE_URI=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable ./bin/prove_<здесь версия>_linux_amd6 
+DATABASE_URI=<DSN> 
+```
+
+Проверка работы DB
+
+GET http://localhost:8080/ping
+200 Ok
+500 Error
+
+## API
+* {{port}} = :8080
+* {{domain}} = http://localhost{{port}}/api
+
+### Создание группы
+* POST {{dmain}}/group 201
+Добавить уникальное название группы
+```azure
+{
+    "name":"ИП-200"
+}
+```
+
+### Все группы
+* GET {{domain}}/group 200
+
+
+### Регистрация пользователя 
+<em><small>знаю, что этого не было в тз, но было "как бы ты его писал, работая над энтерпрайз проектом"</small></em>
+
+Создание нового студента, используя его ФИО и т.д.
+* POST {{dmain}}/user/register 201
+```azure
+{
+    "email": "bob@mail.ru",
+    "login":"bob",
+    "password": "mypass",
+    "surname": "Штирлиц",
+    "name": "Иван",
+    "patronymic": "Васильевич",
+    "group_id": "d47138a2-2bb9-11ee-9e4d-5b1d4482e44d"
+} 
+```
+### Авторизация 
+
+* POST {{dmain}}/user/login 200
+```azure
+{
+    "login": "bob",
+    "password": "mypass"
+} 
 ```
 
 
@@ -28,7 +75,7 @@ DATABASE_URI=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable 
 ## Команды Makefile
 ### Start
 
-Старт prove
+Старт prove (скомпилирует и запустит)
 ```azure
 make build_d
 ```
