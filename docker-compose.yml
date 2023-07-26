@@ -37,7 +37,7 @@ services:
     networks:
       - mynet
 volumes:
-  indra-data:
+  prove-data:
 networks:
   mynet:
     driver: bridge

@@ -64,7 +64,7 @@ func TestCheckEnvironFlag(t *testing.T) {
 
 func TestGetHost(t *testing.T) {
 	type args struct {
-		indra string
+		prove string
 		cfg   config.HTTP
 	}
 	tests := []struct {
@@ -76,35 +76,35 @@ func TestGetHost(t *testing.T) {
 			name: "positive test #1",
 			args: args{
 				cfg:   config.HTTP{BaseURL: "http://localhost:8080"},
-				indra: "wEuWothteri_t23",
+				prove: "wEuWothteri_t23",
 			},
 			want: "http://localhost:8080/wEuWothteri_t23",
 		}, {
 			name: "negative test #1 extra closing slash",
 			args: args{
 				cfg:   config.HTTP{BaseURL: "http://localhost:8080/"},
-				indra: "wEuWothteri_t23",
+				prove: "wEuWothteri_t23",
 			},
 			want: "http://localhost:8080//wEuWothteri_t23",
 		}, {
 			name: "negative test #2 missing protocol",
 			args: args{
 				cfg:   config.HTTP{BaseURL: "localhost:8080"},
-				indra: "wEuWothteri_t23",
+				prove: "wEuWothteri_t23",
 			},
 			want: "localhost:8080/wEuWothteri_t23",
 		}, {
 			name: "negative test #3 missing protocol and port",
 			args: args{
 				cfg:   config.HTTP{BaseURL: "localhost"},
-				indra: "wEuWothteri_t23",
+				prove: "wEuWothteri_t23",
 			},
 			want: "localhost/wEuWothteri_t23",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetHost(tt.args.cfg, tt.args.indra); got != tt.want {
+			if got := GetHost(tt.args.cfg, tt.args.prove); got != tt.want {
 				t.Errorf("GetHost() = %v, want %v", got, tt.want)
 			}
 		})

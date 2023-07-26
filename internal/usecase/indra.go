@@ -14,19 +14,19 @@ var (
 	ErrBadRequest    = errors.New("bad request")
 )
 
-// IndraUseCase -.
-type IndraUseCase struct {
-	repo IndraRepo
+// ProveUseCase -.
+type ProveUseCase struct {
+	repo ProveRepo
 }
 
 // New -.
-func New(r IndraRepo) *IndraUseCase {
-	return &IndraUseCase{
+func New(r ProveRepo) *ProveUseCase {
+	return &ProveUseCase{
 		repo: r,
 	}
 }
 
-func (uc *IndraUseCase) UserFindByLogin(ctx context.Context, s string) (*entity.Authentication, error) {
+func (uc *ProveUseCase) UserFindByLogin(ctx context.Context, s string) (*entity.Authentication, error) {
 	//auth.Login = ctx.Value(auth.Cookie.AccessTokenName).(string)
 	a, err := uc.repo.GetByLogin(ctx, s)
 	if err != nil {
@@ -34,7 +34,7 @@ func (uc *IndraUseCase) UserFindByLogin(ctx context.Context, s string) (*entity.
 	}
 	return a, nil
 }
-func (uc *IndraUseCase) UserFindByID(ctx context.Context, s string) (*entity.Authentication, error) {
+func (uc *ProveUseCase) UserFindByID(ctx context.Context, s string) (*entity.Authentication, error) {
 	//auth.Login = ctx.Value(auth.Cookie.AccessTokenName).(string)
 	a, err := uc.repo.GetByID(ctx, s)
 	if err != nil {
@@ -42,7 +42,7 @@ func (uc *IndraUseCase) UserFindByID(ctx context.Context, s string) (*entity.Aut
 	}
 	return a, nil
 }
-func (uc *IndraUseCase) SavePass(ctx context.Context, c *entity.Pass) error {
+func (uc *ProveUseCase) SavePass(ctx context.Context, c *entity.Pass) error {
 	err := c.Validate()
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (uc *IndraUseCase) SavePass(ctx context.Context, c *entity.Pass) error {
 	return nil
 }
 
-func (uc *IndraUseCase) SaveText(ctx context.Context, c *entity.Text) error {
+func (uc *ProveUseCase) SaveText(ctx context.Context, c *entity.Text) error {
 	err := c.Validate()
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (uc *IndraUseCase) SaveText(ctx context.Context, c *entity.Text) error {
 	}
 	return nil
 }
-func (uc *IndraUseCase) SaveCard(ctx context.Context, c *entity.Card) error {
+func (uc *ProveUseCase) SaveCard(ctx context.Context, c *entity.Card) error {
 	err := c.Validate()
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (uc *IndraUseCase) SaveCard(ctx context.Context, c *entity.Card) error {
 	}
 	return nil
 }
-func (uc *IndraUseCase) Register(ctx context.Context, auth *entity.Authentication) error {
+func (uc *ProveUseCase) Register(ctx context.Context, auth *entity.Authentication) error {
 	//auth.Login = ctx.Value(auth.Cookie.AccessTokenName).(string)
 	err := uc.repo.Registry(ctx, auth)
 	if err != nil {
@@ -93,7 +93,7 @@ func (uc *IndraUseCase) Register(ctx context.Context, auth *entity.Authenticatio
 }
 
 // ShortLink принимает короткий URL и возвращает длинный (GET /api/{key})
-func (uc *IndraUseCase) ShortLink(ctx context.Context, ind *entity.Indra) (*entity.Indra, error) {
+func (uc *ProveUseCase) ShortLink(ctx context.Context, ind *entity.Prove) (*entity.Prove, error) {
 	ind.Config = config.GetConfig()
 	sh, err := uc.repo.Get(ctx, ind)
 	if err != nil {
@@ -108,7 +108,7 @@ func (uc *IndraUseCase) ShortLink(ctx context.Context, ind *entity.Indra) (*enti
 }
 
 // CardListUserID возвращает все сохранённые карты пользователя
-func (uc *IndraUseCase) CardListUserID(ctx context.Context, u *entity.User) (*entity.CardList, error) {
+func (uc *ProveUseCase) CardListUserID(ctx context.Context, u *entity.User) (*entity.CardList, error) {
 	ol, err := uc.repo.CardListGetUserID(ctx, u)
 	if err == nil {
 		return ol, nil
@@ -116,14 +116,14 @@ func (uc *IndraUseCase) CardListUserID(ctx context.Context, u *entity.User) (*en
 	return nil, ErrBadRequest
 }
 
-func (uc *IndraUseCase) SaveService() error {
+func (uc *ProveUseCase) SaveService() error {
 	err := uc.repo.Save()
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (uc *IndraUseCase) ReadService() error {
+func (uc *ProveUseCase) ReadService() error {
 	err := uc.repo.Read()
 	if err != nil {
 		return err

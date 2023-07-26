@@ -5,11 +5,11 @@ import (
 )
 
 type (
-	Indras []Indra
+	Proves []Prove
 	UserID string
 
-	// Indra -.
-	Indra struct {
+	// Prove -.
+	Prove struct {
 		*config.Config `json:"-"`
 		Slug           `json:"slug,omitempty" example:"1674872720465761244B_5"`
 		URL            `json:"url,omitempty" example:"https://example.com/go/to/home.html"`

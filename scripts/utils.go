@@ -59,8 +59,8 @@ func UniqueString() string {
 }
 
 // GetHost формирует короткий URL
-func GetHost(cfg config.HTTP, indra string) string {
-	return fmt.Sprintf("%s/%s", cfg.BaseURL, indra)
+func GetHost(cfg config.HTTP, prove string) string {
+	return fmt.Sprintf("%s/%s", cfg.BaseURL, prove)
 }
 
 // CheckEnvironFlag проверка значения переменной окружения и одноименного флага

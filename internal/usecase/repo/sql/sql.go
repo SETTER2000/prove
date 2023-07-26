@@ -154,7 +154,7 @@ func (i *InSQL) SaveCard(ctx context.Context, c *entity.Card) error {
 
 }
 
-func (i *InSQL) Post(ctx context.Context, sh *entity.Indra) error {
+func (i *InSQL) Post(ctx context.Context, sh *entity.Prove) error {
 	stmt, err := i.w.db.Prepare("INSERT INTO public.prove (slug, url, user_id) VALUES ($1,$2,$3)")
 	if err != nil {
 		log.Fatal(err)
@@ -168,7 +168,7 @@ func (i *InSQL) Post(ctx context.Context, sh *entity.Indra) error {
 	return nil
 }
 
-func (i *InSQL) Put(ctx context.Context, sh *entity.Indra) error {
+func (i *InSQL) Put(ctx context.Context, sh *entity.Prove) error {
 	return i.Post(ctx, sh)
 }
 
@@ -179,7 +179,7 @@ func NewSQLConsumer(db *sqlx.DB) *consumerSQL {
 	}
 }
 
-func (i *InSQL) Get(ctx context.Context, sh *entity.Indra) (*entity.Indra, error) {
+func (i *InSQL) Get(ctx context.Context, sh *entity.Prove) (*entity.Prove, error) {
 	var slug, url, id string
 	var del bool
 	rows, err := i.w.db.Query("SELECT slug, url, user_id, del FROM prove WHERE slug = $1 OR url = $2 ", sh.Slug, sh.URL)

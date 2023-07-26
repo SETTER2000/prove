@@ -9,17 +9,17 @@ Prove - REST API сервис предоставляет решения алго
 Если есть сервер удалённый можно запустить docker-compose.yml, 
 тем самым поднять DB Postgres и Adminer, в этом случаи adminer будет доступен по :8077
 * Можно подключиться к demo серверу сейчас так:
-* prove -d postgres://bob:mypasswd@194.67.104.167:5432/indra?sslmode=disable
+* prove -d postgres://bob:mypasswd@194.67.104.167:5432/prove?sslmode=disable
 
 ### Linux
 Подключение DB через флаг -d
 ```
-./bin/prove_<здесь версия>_linux_amd6 -d postgres://indra:DBindra-2023@127.0.0.1:5432/indra?sslmode=disable
+./bin/prove_<здесь версия>_linux_amd6 -d postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
 ```
 
 Возможно так же подключить DB через переменную окружения
 ```
-DATABASE_URI=postgres://indra:DBindra-2023@127.0.0.1:5432/indra?sslmode=disable ./bin/prove_<здесь версия>_linux_amd6 
+DATABASE_URI=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable ./bin/prove_<здесь версия>_linux_amd6 
 ```
 
 

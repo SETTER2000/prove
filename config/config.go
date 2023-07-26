@@ -87,7 +87,7 @@ func GetConfig() *Config {
 		flag.StringVar(&cfg.Author, "author", "", "author project")
 		flag.BoolVar(&cfg.EnableHTTPS, "ps", false, "start server with https protocol")
 		flag.Usage = func() {
-			fmt.Fprintf(flag.CommandLine.Output(), "Indra Version %s %v\nUsage : Project Indra - URL Shortener Server\n", os.Args[0], cfg.Version)
+			fmt.Fprintf(flag.CommandLine.Output(), "Prove Version %s %v\nUsage : Project Prove - URL Shortener Server\n", os.Args[0], cfg.Version)
 			flag.PrintDefaults()
 		}
 

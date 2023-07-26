@@ -79,7 +79,7 @@ func PortGRPC() Option {
 }
 
 // EnableGRPC - включить поддержку gRPC.
-func EnableGRPC(h *handler.IIndraServer) Option {
+func EnableGRPC(h *handler.IProveServer) Option {
 	var logger = logrus.New()
 
 	grpcSrv := grpc.NewServer(grpc.Deps{

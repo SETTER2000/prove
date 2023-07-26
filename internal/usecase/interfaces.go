@@ -12,9 +12,9 @@ import (
 //go:generate mockgen -source=interfaces.go -destination=mocks/mock.go
 
 type (
-	// Indra -.
+	// Prove -.
 	// Post -.
-	Indra interface {
+	Prove interface {
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
@@ -22,13 +22,13 @@ type (
 		Register(context.Context, *entity.Authentication) error
 		UserFindByLogin(context.Context, string) (*entity.Authentication, error)
 		UserFindByID(context.Context, string) (*entity.Authentication, error)
-		ShortLink(context.Context, *entity.Indra) (*entity.Indra, error)
+		ShortLink(context.Context, *entity.Prove) (*entity.Prove, error)
 		ReadService() error
 		SaveService() error
 	}
 
-	// IndraRepo -.
-	IndraRepo interface {
+	// ProveRepo -.
+	ProveRepo interface {
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
@@ -37,9 +37,9 @@ type (
 		GetByLogin(context.Context, string) (*entity.Authentication, error)
 		GetByID(context.Context, string) (*entity.Authentication, error)
 		// Post от shorturl
-		Post(context.Context, *entity.Indra) error
-		Put(context.Context, *entity.Indra) error
-		Get(context.Context, *entity.Indra) (*entity.Indra, error)
+		Post(context.Context, *entity.Prove) error
+		Put(context.Context, *entity.Prove) error
+		Get(context.Context, *entity.Prove) (*entity.Prove, error)
 		GetAll(context.Context, *entity.User) (*entity.User, error)
 		GetAllUrls() (entity.CountURLs, error)
 		GetAllUsers() (entity.CountUsers, error)
@@ -55,6 +55,6 @@ type (
 // реализует ли структура *batchPostProvider интерфейс BatchPostProvider —
 // если нет или если методы прописаны неверно,
 // то компилятор выдаст на этой строке ошибку типизации
-var _ IndraRepo = (*memory.Memory)(nil)
-var _ IndraRepo = (*file.InFiles)(nil)
-var _ IndraRepo = (*sql.InSQL)(nil)
+var _ ProveRepo = (*memory.Memory)(nil)
+var _ ProveRepo = (*file.InFiles)(nil)
+var _ ProveRepo = (*sql.InSQL)(nil)

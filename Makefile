@@ -12,7 +12,7 @@ race:
 MAIN=main.go
 
 # Где лежат исходники
-APP_DIR=cmd/indra
+APP_DIR=cmd/prove
 
 # Путь где создать бинарник
 TARGET_DIR=bin
@@ -47,7 +47,7 @@ BAKING="-X 'github.com/SETTER2000/prove/internal/app.OSString=`go env GOOS`' -X 
 # Подключение к базе данных
 #DB=postgres://bob:Bob-2023@194.67.104.167:5432/prove?sslmode=disable
 #DB=postgres://bob:Bob2023@postgres:5433/prove?sslmode=disable
-DB=postgres://indra:DBindra-2023@127.0.0.1:5432/indra?sslmode=disable
+DB=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
 
 
 # HELP по флагамq
@@ -69,7 +69,7 @@ short:
 	./$(APP_DIR)/$(BIN_NAME)
 
 docker:
-	go build -ldflags "-X 'github.com/SETTER2000/prove/internal/app.OSString=`go env GOOS`' -X 'github.com/SETTER2000/prove/internal/app.archString=`go env GOARCH`' -X 'github.com/SETTER2000/prove/internal/app.dateString=`date`' -X 'github.com/SETTER2000/prove/internal/app.versionString=`git describe --tags`' -X 'github.com/SETTER2000/prove/internal/app.commitString=`git rev-parse HEAD`'" -o prove ./cmd/indra/main.go
+	go build -ldflags "-X 'github.com/SETTER2000/prove/internal/app.OSString=`go env GOOS`' -X 'github.com/SETTER2000/prove/internal/app.archString=`go env GOARCH`' -X 'github.com/SETTER2000/prove/internal/app.dateString=`date`' -X 'github.com/SETTER2000/prove/internal/app.versionString=`git describe --tags`' -X 'github.com/SETTER2000/prove/internal/app.commitString=`git rev-parse HEAD`'" -o prove ./cmd/prove/main.go
 	./prove
 
 
@@ -119,7 +119,7 @@ build:
 	go build -ldflags $(BAKING) -o $(TARGET_DIR)/$(BIN_NAME_L) $(APP_DIR)/$(MAIN)
 
 # Запустить сервис prove с подключением к DB
-# FILE_STORAGE_PATH=;DATABASE_DSN=postgres://prove:DBindra-2023@127.0.0.1:5432/prove?sslmode=disable
+# FILE_STORAGE_PATH=;DATABASE_DSN=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
 run:
 	./$(TARGET_DIR)/$(BIN_NAME_L) -d $(DB)
 

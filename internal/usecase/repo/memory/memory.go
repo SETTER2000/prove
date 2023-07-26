@@ -13,7 +13,7 @@ import (
 
 type Memory struct {
 	cfg  *config.Config
-	m    map[entity.UserID]entity.Indras // <-- это поле под ним
+	m    map[entity.UserID]entity.Proves // <-- это поле под ним
 	lock sync.Mutex
 }
 
@@ -21,7 +21,7 @@ type Memory struct {
 func New() *Memory {
 	return &Memory{
 		cfg: config.GetConfig(),
-		//m:   make(map[entity.UserID]entity.Indras),
+		//m:   make(map[entity.UserID]entity.Proves),
 	}
 }
 
@@ -51,7 +51,7 @@ func (s *Memory) GetByID(context.Context, string) (*entity.Authentication, error
 
 // Get получить конкретный URL по идентификатору этого URL и
 // только если этот линк записал текущий пользователь.
-func (s *Memory) Get(ctx context.Context, ind *entity.Indra) (*entity.Indra, error) {
+func (s *Memory) Get(ctx context.Context, ind *entity.Prove) (*entity.Prove, error) {
 	u, err := s.searchBySlug(ind)
 	if err != nil {
 		return nil, er.ErrNotFound
@@ -60,8 +60,8 @@ func (s *Memory) Get(ctx context.Context, ind *entity.Indra) (*entity.Indra, err
 }
 
 // search by slug
-func (s *Memory) searchBySlug(ind *entity.Indra) (*entity.Indra, error) {
-	shorts := entity.Indras{}
+func (s *Memory) searchBySlug(ind *entity.Prove) (*entity.Prove, error) {
+	shorts := entity.Proves{}
 	for _, uid := range s.m {
 		for j := 0; j < len(uid); j++ {
 			shorts = append(shorts, uid[j])
@@ -108,7 +108,7 @@ func (s *Memory) GetAll(ctx context.Context, u *entity.User) (*entity.User, erro
 }
 
 // Put обновить данные в память.
-func (s *Memory) Put(ctx context.Context, ind *entity.Indra) error {
+func (s *Memory) Put(ctx context.Context, ind *entity.Prove) error {
 	ln := len(s.m[ind.UserID])
 	if ln < 1 {
 		s.Post(ctx, ind)
@@ -131,7 +131,7 @@ func (s *Memory) Put(ctx context.Context, ind *entity.Indra) error {
 //			UserID: str1
 //		}
 //	}
-func (s *Memory) Post(ctx context.Context, ind *entity.Indra) error {
+func (s *Memory) Post(ctx context.Context, ind *entity.Prove) error {
 	s.m[ind.UserID] = append(s.m[ind.UserID], *ind)
 	return nil
 }

@@ -33,14 +33,14 @@ import (
 //		services *service.Service
 //	}
 type ServerHandler struct {
-	s   usecase.Indra
+	s   usecase.Prove
 	l   logger.Logger
 	cfg *config.Config
 }
 
 //func NewServerHandler(services *service.Service) *ServerHandler {
 
-func NewServerHandler(s usecase.Indra) *ServerHandler {
+func NewServerHandler(s usecase.Prove) *ServerHandler {
 	return &ServerHandler{
 		s:   s,
 		l:   logger.GetLogger(),

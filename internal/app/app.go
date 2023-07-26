@@ -38,7 +38,7 @@ func Run() {
 	// seed
 	rand.Seed(time.Now().UnixNano())
 
-	var repo usecase.IndraRepo
+	var repo usecase.ProveRepo
 
 	if !scripts.CheckEnvironFlag("DATABASE_DSN", config.GetConfig().ConnectDB) {
 		if config.GetConfig().FileStorage == "" {
@@ -72,7 +72,7 @@ func Run() {
 	httpServer := server.New(handlers.InitRoutes(),
 		server.Host(),
 		server.PortGRPC(),
-		server.EnableGRPC(hgrpc.NewIIndraHandler(apiUseCase)),
+		server.EnableGRPC(hgrpc.NewIProveHandler(apiUseCase)),
 		//// на чтение предел*-
 		//server.ReadTimeout(30*time.Second),
 		//// на запись предел
@@ -88,7 +88,7 @@ func Run() {
 	select {
 	case s := <-interrupt:
 		if err := apiUseCase.SaveService(); err != nil {
-			l.Error(fmt.Errorf("app - Save - indraUseCase.SaveService: %w", err))
+			l.Error(fmt.Errorf("app - Save - proveUseCase.SaveService: %w", err))
 		}
 		l.Info("app - Run - signal: " + s.String())
 	case err := <-httpServer.Notify():

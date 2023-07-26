@@ -28,7 +28,7 @@ type (
 
 	InFiles struct {
 		//lock sync.Mutex // <-- этот мьютекс защищает
-		m   map[entity.UserID]entity.Indras
+		m   map[entity.UserID]entity.Proves
 		cfg *config.Config
 		r   *consumer
 		w   *producer
@@ -39,7 +39,7 @@ type (
 func New() *InFiles {
 	return &InFiles{
 		cfg: config.GetConfig(),
-		m:   make(map[entity.UserID]entity.Indras),
+		m:   make(map[entity.UserID]entity.Proves),
 		// создаём новый потребитель
 		r: NewConsumer(),
 		// создаём новый производитель
@@ -66,19 +66,19 @@ func NewConsumer() *consumer {
 }
 
 // Post сохранить данные в файл
-func (i *InFiles) Post(ctx context.Context, ind *entity.Indra) error {
+func (i *InFiles) Post(ctx context.Context, ind *entity.Prove) error {
 	//i.lock.Lock()
 	//defer i.lock.Unlock()
 	return i.post(ind)
 }
 
-func (i *InFiles) post(ind *entity.Indra) error {
+func (i *InFiles) post(ind *entity.Prove) error {
 	i.m[ind.UserID] = append(i.m[ind.UserID], *ind)
 	return nil
 }
 
 // Put обновить данные в файле
-func (i *InFiles) Put(ctx context.Context, ind *entity.Indra) error {
+func (i *InFiles) Put(ctx context.Context, ind *entity.Prove) error {
 	ln := len(i.m[ind.UserID])
 	if ln < 1 {
 		i.Post(ctx, ind)
@@ -98,11 +98,11 @@ func (p *producer) Close() error {
 }
 
 // Get получить конкретный URL по идентификатору
-func (i *InFiles) Get(ctx context.Context, ind *entity.Indra) (*entity.Indra, error) {
+func (i *InFiles) Get(ctx context.Context, ind *entity.Prove) (*entity.Prove, error) {
 	return i.searchBySlug(ind)
 }
 
-func (i *InFiles) searchUID(ind *entity.Indra) (*entity.Indra, error) {
+func (i *InFiles) searchUID(ind *entity.Prove) (*entity.Prove, error) {
 	for _, short := range i.m[entity.UserID(ind.UserID)] {
 		if short.Slug == ind.Slug {
 			ind.URL = short.URL
@@ -116,8 +116,8 @@ func (i *InFiles) searchUID(ind *entity.Indra) (*entity.Indra, error) {
 }
 
 // search by slug
-func (i *InFiles) searchBySlug(ind *entity.Indra) (*entity.Indra, error) {
-	shorts := entity.Indras{}
+func (i *InFiles) searchBySlug(ind *entity.Prove) (*entity.Prove, error) {
+	shorts := entity.Proves{}
 	for _, uid := range i.m {
 		for j := 0; j < len(uid); j++ {
 			shorts = append(shorts, uid[j])
@@ -134,7 +134,7 @@ func (i *InFiles) searchBySlug(ind *entity.Indra) (*entity.Indra, error) {
 	return ind, nil
 }
 func (i *InFiles) getAll() error {
-	ind := &entity.Indra{}
+	ind := &entity.Prove{}
 	for {
 		if err := i.r.decoder.Decode(&ind); err != nil {
 			if err == io.EOF {
