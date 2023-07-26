@@ -3,10 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/SETTER2000/prove/config"
-	"github.com/SETTER2000/prove/internal/controller/grpc"
-	"github.com/SETTER2000/prove/internal/controller/grpc/handler"
 	"github.com/SETTER2000/prove/scripts"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/acme/autocert"
 	"log"
 	"net"
@@ -18,21 +15,6 @@ import (
 // Option -.
 type Option func(*Server)
 
-// Port -.
-//func Port(port string) Option {
-//	return func(s *Server) {
-//		s.server.Addr = net.JoinHostPort("", port)
-//	}
-//}
-
-//// Host -.
-//func Host(host string) Option {
-//	return func(s *Server) {
-//		domain := strings.Split(host, ":")
-//		s.server.Addr = net.JoinHostPort(domain[0], domain[1])
-//	}
-//}
-
 // Host -.
 func Host() Option {
 	host := config.GetConfig().ServerAddress
@@ -42,13 +24,6 @@ func Host() Option {
 		s.server.Addr = net.JoinHostPort(domain[0], domain[1])
 	}
 }
-
-//func Host(host string) Option {
-//	return func(s *Server) {
-//		domain := strings.Split(host, ":")
-//		s.server.Addr = net.JoinHostPort(domain[0], domain[1])
-//	}
-//}
 
 // ReadTimeout -.
 func ReadTimeout(timeout time.Duration) Option {
@@ -75,20 +50,6 @@ func ShutdownTimeout(timeout time.Duration) Option {
 func PortGRPC() Option {
 	return func(s *Server) {
 		s.grpcPort = config.GetConfig().Port
-	}
-}
-
-// EnableGRPC - включить поддержку gRPC.
-func EnableGRPC(h *handler.IProveServer) Option {
-	var logger = logrus.New()
-
-	grpcSrv := grpc.NewServer(grpc.Deps{
-		Logger:  logger,
-		Handler: h,
-	})
-
-	return func(s *Server) {
-		s.srv = grpcSrv
 	}
 }
 

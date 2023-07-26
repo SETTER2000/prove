@@ -47,7 +47,7 @@ BAKING="-X 'github.com/SETTER2000/prove/internal/app.OSString=`go env GOOS`' -X 
 # Подключение к базе данных
 #DB=postgres://bob:Bob-2023@194.67.104.167:5432/prove?sslmode=disable
 #DB=postgres://bob:Bob2023@postgres:5433/prove?sslmode=disable
-DB=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
+DB=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
 
 
 # HELP по флагамq
@@ -119,7 +119,7 @@ build:
 	go build -ldflags $(BAKING) -o $(TARGET_DIR)/$(BIN_NAME_L) $(APP_DIR)/$(MAIN)
 
 # Запустить сервис prove с подключением к DB
-# FILE_STORAGE_PATH=;DATABASE_DSN=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
+# FILE_STORAGE_PATH=;DATABASE_DSN=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
 run:
 	./$(TARGET_DIR)/$(BIN_NAME_L) -d $(DB)
 

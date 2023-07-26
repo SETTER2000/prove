@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"github.com/SETTER2000/prove/config"
-	hgrpc "github.com/SETTER2000/prove/internal/controller/grpc/handler"
 	"github.com/SETTER2000/prove/internal/usecase/repo/file"
 	"github.com/SETTER2000/prove/internal/usecase/repo/memory"
 	"github.com/SETTER2000/prove/internal/usecase/repo/sql"
@@ -71,12 +70,6 @@ func Run() {
 
 	httpServer := server.New(handlers.InitRoutes(),
 		server.Host(),
-		server.PortGRPC(),
-		server.EnableGRPC(hgrpc.NewIProveHandler(apiUseCase)),
-		//// на чтение предел*-
-		//server.ReadTimeout(30*time.Second),
-		//// на запись предел
-		//server.WriteTimeout(60*time.Second),
 		// опция подключения HTTPS
 		server.EnableHTTPS(),
 	)

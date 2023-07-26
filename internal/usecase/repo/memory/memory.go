@@ -89,7 +89,6 @@ func (s *Memory) GetAllUrls() (entity.CountURLs, error) {
 }
 
 // GetAllUsers получить всех пользователей
-// TODO не правильно работает, переделать
 func (s *Memory) GetAllUsers() (entity.CountUsers, error) {
 	return entity.CountUsers(len(s.m)), nil
 }

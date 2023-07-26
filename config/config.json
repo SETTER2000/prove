@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "Prove"
+    "name": "Prove",
+    "version": "0.1.0"
   },
   "http": {
     "enable_https": false,

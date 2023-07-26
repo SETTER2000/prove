@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/SETTER2000/prove/pkg/log/logger"
+	"github.com/caarlos0/env/v7"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
 	"sync"
@@ -21,6 +22,7 @@ type (
 	}
 	App struct {
 		Name           string `env-required:"true" json:"name"  yaml:"name"    env:"APP_NAME"`
+		Version        string `env-required:"true" json:"version"  yaml:"version" env:"APP_VERSION"`
 		ConfigFileName string `env:"CONFIG"`
 		Author         string `json:"author" yml:"author" env:"AUTHOR" envDefault:"Soviet Union"`
 	}
@@ -70,7 +72,7 @@ func GetConfig() *Config {
 		cfg = &Config{}
 		flag.StringVar(&cfg.ConfigFileName, "c", "", "configuration file name")
 		flag.StringVar(&cfg.BaseURL, "b", cfg.BaseURL, "the base address of the resulting shortened URL")
-		flag.StringVar(&cfg.ConnectDB, "d", "", "dsn connect string urlExample PostgreSQL: postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable")
+		flag.StringVar(&cfg.ConnectDB, "d", "", "dsn connect string urlExample PostgreSQL: postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable")
 		flag.StringVar(&cfg.ServerAddress, "a", "", "host to listen on")
 		flag.BoolVar(&cfg.EnableHTTPS, "s", false, "start server with https protocol")
 		flag.StringVar(&cfg.ServerDomain, "dm", "", "server domain name")
@@ -87,7 +89,7 @@ func GetConfig() *Config {
 		flag.StringVar(&cfg.Author, "author", "", "author project")
 		flag.BoolVar(&cfg.EnableHTTPS, "ps", false, "start server with https protocol")
 		flag.Usage = func() {
-			fmt.Fprintf(flag.CommandLine.Output(), "Prove Version %s %v\nUsage : Project Prove - URL Shortener Server\n", os.Args[0], cfg.Version)
+			fmt.Fprintf(flag.CommandLine.Output(), "Prove Version %s %v\nUsage : Project Prove - Server\n", os.Args[0], cfg.Version)
 			flag.PrintDefaults()
 		}
 

@@ -348,6 +348,7 @@ CREATE TABLE IF NOT EXISTS public.card
     FOREIGN KEY (user_id) REFERENCES public."user" (user_id)
         MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
 CREATE TABLE IF NOT EXISTS public.pass
 (
     login       VARCHAR(100) NOT NULL,

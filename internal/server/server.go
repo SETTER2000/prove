@@ -3,9 +3,7 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/SETTER2000/prove/config"
-	"github.com/SETTER2000/prove/internal/controller/grpc"
 	"net/http"
 	"time"
 )
@@ -25,7 +23,6 @@ const (
 // Server -.
 type Server struct {
 	server          *http.Server
-	srv             *grpc.Server
 	cfg             *config.Config
 	notify          chan error
 	certFile        string
@@ -69,7 +66,6 @@ func (s *Server) start() {
 	switch s.isHTTPS {
 	case true:
 		go func() {
-			s.srv.Logger.Info("Go backend serving on ", fmt.Sprintf("https://%s%s/ping", config.GetConfig().ServerDomain, s.server.Addr))
 			s.notify <- s.server.ListenAndServeTLS(s.certFile, s.keyFile)
 			close(s.notify)
 		}()
@@ -79,13 +75,6 @@ func (s *Server) start() {
 			close(s.notify)
 		}()
 	}
-
-	go func() {
-		s.srv.Logger.Info("Starting gRPC Server, PORT :", s.grpcPort)
-		s.notify <- s.srv.ListenAndServer(s.grpcPort)
-		close(s.notify)
-	}()
-
 }
 
 // Notify -.

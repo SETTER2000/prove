@@ -14,12 +14,12 @@ Prove - REST API сервис предоставляет решения алго
 ### Linux
 Подключение DB через флаг -d
 ```
-./bin/prove_<здесь версия>_linux_amd6 -d postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable
+./bin/prove_<здесь версия>_linux_amd6 -d postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
 ```
 
 Возможно так же подключить DB через переменную окружения
 ```
-DATABASE_URI=postgres://prove:DBprove-2023@127.0.0.1:5432/prove?sslmode=disable ./bin/prove_<здесь версия>_linux_amd6 
+DATABASE_URI=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable ./bin/prove_<здесь версия>_linux_amd6 
 ```
 
 
