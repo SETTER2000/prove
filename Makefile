@@ -102,7 +102,7 @@ godoc:
 doc:
 	godoc -http=rooder.ru:6060  -play >/dev/null &
 
-# Скомпилировать и запустить бинарник сервиса shorturl (shortener) с подключением к DB
+# Скомпилировать и запустить бинарник сервиса с подключением к DB
 # и разрешением чтения заголовка X-Real-IP или X-Forwarded-For
 short_x:
 	go build -tags pro -ldflags $(BAKING) -o $(APP_DIR)/$(BIN_NAME) $(APP_DIR)/$(MAIN)
@@ -118,7 +118,7 @@ short_g:
 build:
 	go build -ldflags $(BAKING) -o $(TARGET_DIR)/$(BIN_NAME_L) $(APP_DIR)/$(MAIN)
 
-# Запустить сервис prove с подключением к DB
+# Запустить сервис с подключением к DB
 # FILE_STORAGE_PATH=;DATABASE_DSN=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
 run:
 	./$(TARGET_DIR)/$(BIN_NAME_L) -d $(DB)
@@ -128,7 +128,7 @@ build_d:
 	go build -ldflags $(BAKING) -o $(TARGET_DIR)/$(BIN_NAME_L) $(APP_DIR)/$(MAIN)
 	./$(TARGET_DIR)/$(BIN_NAME_L) -d $(DB)
 
-# Запустить сервис shorturl (shortener) in File
+# Запустить сервис in File
 short_f:
 	go build -ldflags $(BAKING) -o $(TARGET_DIR)/$(BIN_NAME) $(APP_DIR)/$(MAIN)
 	./$(TARGET_DIR)/$(BIN_NAME) -d= -f=storage.txt

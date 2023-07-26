@@ -3,12 +3,6 @@
 
 name: Go
 
-# Когда происходит событие, можно предпринять какие то действия в CI.
-# Типы событий:
-#  push, commit,
-#  issues, pull_request
-#  issue_comment, label, gollum
-
 on:
   push:
     branches:
