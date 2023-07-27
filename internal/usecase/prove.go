@@ -80,6 +80,19 @@ func (uc *ProveUseCase) SaveGroup(ctx context.Context, c *entity.Group) error {
 	return nil
 }
 
+func (uc *ProveUseCase) SaveSolution(ctx context.Context, c *entity.Solution) error {
+	err := c.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = uc.repo.SaveSolution(ctx, c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // SaveTask создать задачу
 func (uc *ProveUseCase) SaveTask(ctx context.Context, c *entity.Task) error {
 	err := c.Validate()
@@ -137,6 +150,16 @@ func (uc *ProveUseCase) ShortLink(ctx context.Context, ind *entity.Prove) (*enti
 // CardListUserID возвращает все сохранённые карты пользователя
 func (uc *ProveUseCase) CardListUserID(ctx context.Context, u *entity.User) (*entity.CardList, error) {
 	ol, err := uc.repo.CardListGetUserID(ctx, u)
+	if err == nil {
+		return ol, nil
+	}
+	return nil, ErrBadRequest
+}
+
+// TaskKey возвращает ответ по задаче
+func (uc *ProveUseCase) TaskKey(ctx context.Context, u *entity.User, t *entity.Task) (*entity.SolutionList, error) {
+
+	ol, err := uc.repo.TaskKey(ctx, u, t)
 	if err == nil {
 		return ol, nil
 	}

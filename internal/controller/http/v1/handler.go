@@ -71,10 +71,10 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 		h.Post("/group", sh.hGroup)
 		h.Get("/group", sh.hGroups)
 		h.Post("/task", sh.hTask)
+		h.Get("/task/{key}", sh.hTask)
 		h.Get("/task", sh.hTasks)
+		h.Post("/solution", sh.hSolution)
 
-		h.Post("/card", sh.hCard)
-		h.Get("/card", sh.hCards)
 		h.Post("/pass", sh.hPass)
 		h.Post("/text", sh.hText)
 
@@ -159,6 +159,50 @@ func (sh *ServerHandler) hGroup(w http.ResponseWriter, r *http.Request) {
 		sh.error(w, r, http.StatusBadRequest, err)
 		return
 	}
+	sh.respond(w, r, http.StatusOK, c)
+}
+
+// @Summary     Return JSON empty
+// @Description Save data solution
+// @ID         	Сохранить ответ по задаче.
+// @Tags  	    prove
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — данные успешно сохранены
+// @Failure     400 {object} response — неверный формат запроса
+// @Failure     409 {object} response — имя уже занято
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /solution [post]
+func (sh *ServerHandler) hSolution(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, err := sh.IsAuthenticated(w, r)
+	if err != nil {
+		sh.respond(w, r, http.StatusUnauthorized, nil)
+		return
+	}
+	c := &entity.Solution{
+		UserID: userID,
+	}
+
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &c); err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	err = sh.s.SaveSolution(ctx, c)
+	if err != nil {
+		if errors.Is(err, er.ErrAlreadyExists) {
+			sh.error(w, r, http.StatusConflict, err)
+			return
+		}
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	c.Sanitize()
 	sh.respond(w, r, http.StatusOK, c)
 }
 
@@ -426,6 +470,39 @@ func (sh *ServerHandler) hTasks(w http.ResponseWriter, r *http.Request) {
 
 	if len(*ol) < 1 {
 		sh.respond(w, r, http.StatusNoContent, "нет данных для ответа")
+	}
+
+	sh.respond(w, r, http.StatusOK, ol)
+}
+
+// @Summary     Return JSON empty
+// @Description Получить ответ на задачу
+// @ID          hTaskKey
+// @Tags  	    prove-server
+// @Accept      text
+// @Produce     text
+// @Success     200 {object} response — успешная обработка запроса
+// @Success     204 {object} response — нет данных для ответ
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /task/{key} [get]
+func (sh *ServerHandler) hTaskKey(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	u := entity.User{}
+
+	userID, err := sh.IsAuthenticated(w, r)
+	if err != nil {
+		sh.respond(w, r, http.StatusUnauthorized, nil)
+		return
+	}
+
+	data := entity.Task{
+		TaskID: chi.URLParam(r, "key"),
+	}
+
+	u.UserID = userID
+	ol, err := sh.s.TaskKey(ctx, &u, &data)
+	if err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
 	}
 
 	sh.respond(w, r, http.StatusOK, ol)
