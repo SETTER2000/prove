@@ -26,7 +26,7 @@ services:
     networks:
       - mynet
   prove:
-    image: setter2000/prove:0.4.0
+    image: setter2000/prove:0.5.0
     environment:
       DATABASE_URI: "postgres://bob:mypasswd@db:5432/prove?sslmode=disable"
     container_name: "prove"

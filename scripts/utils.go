@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
 
@@ -85,12 +86,18 @@ func IsValidUUID(u string) bool {
 	_, err := uuid.Parse(u)
 	return err == nil
 }
+
+// FindAllMissingNumbers - найти все пропущенные числа.
 func FindAllMissingNumbers(ar []int) ([]int, error) {
 	var res []int
 	if len(ar) < 1 {
 		return nil, fmt.Errorf("error, argument cannot be len: %d", len(ar))
 	}
-	registry := make([]int, len(ar))
+	sort.Slice(ar, func(i, j int) bool {
+		return ar[i] < ar[j]
+	})
+
+	registry := make([]int, ar[len(ar)-1]+1)
 	for i, v := range ar {
 		registry[v] = i
 	}

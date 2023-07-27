@@ -200,6 +200,10 @@ func (sh *ServerHandler) hTaskSolution(w http.ResponseWriter, r *http.Request) {
 			sh.error(w, r, http.StatusConflict, err)
 			return
 		}
+		if errors.Is(err, er.ErrExhaustedCredit) {
+			sh.error(w, r, http.StatusForbidden, err)
+			return
+		}
 		sh.error(w, r, http.StatusBadRequest, err)
 		return
 	}

@@ -154,7 +154,7 @@ func (uc *ProveUseCase) GetSolution(ctx context.Context, s *entity.SolutionData)
 	err := uc.repo.GetSolution(ctx, s)
 	if err != nil {
 		log.Printf("error, user credit exhausted: %s", err.Error())
-		return er.ErrBadRequest
+		return err
 	}
 	solution, err := scripts.FindAllMissingNumbers(s.Data)
 	if err != nil {

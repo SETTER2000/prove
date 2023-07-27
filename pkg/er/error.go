@@ -35,6 +35,7 @@ var (
 	ErrIncorrectLoginOrPass     = errors.New("incorrect login or password")
 	ErrIncorrectToken           = errors.New("incorrect token, the token is rotten")
 	ErrUUID                     = errors.New("id uuid should be")
+	ErrExhaustedCredit          = errors.New("exhausted credit of trust")
 )
 
 type response struct {

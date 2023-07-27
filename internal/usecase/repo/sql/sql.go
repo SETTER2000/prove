@@ -350,7 +350,7 @@ func (i *InSQL) GetSolution(ctx context.Context, s *entity.SolutionData) error {
 	defer stmt.Close()
 	crd := credit + f
 	if crd > maxCredit {
-		return er.ErrBadRequest
+		return er.ErrExhaustedCredit
 	}
 	if _, err = stmt.Exec(&crd, s.UserID); err != nil {
 		return err
