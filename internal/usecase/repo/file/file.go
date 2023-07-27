@@ -217,6 +217,9 @@ func (i *InFiles) SaveText(context.Context, *entity.Text) error {
 func (i *InFiles) SaveGroup(ctx context.Context, c *entity.Group) error {
 	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
 }
+func (i *InFiles) GetAdmin(*entity.User) bool {
+	return false
+}
 func (i *InFiles) SaveSolution(context.Context, *entity.Solution) error {
 	return status.Errorf(codes.Unimplemented, "method SaveSolution not implemented")
 }

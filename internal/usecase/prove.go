@@ -42,6 +42,14 @@ func (uc *ProveUseCase) UserFindByID(ctx context.Context, s string) (*entity.Aut
 	}
 	return a, nil
 }
+
+func (uc *ProveUseCase) GetAdmin(u *entity.User) bool {
+	if ok := uc.repo.GetAdmin(u); !ok {
+		return false
+	}
+
+	return true
+}
 func (uc *ProveUseCase) SavePass(ctx context.Context, c *entity.Pass) error {
 	err := c.Validate()
 	if err != nil {

@@ -170,18 +170,28 @@ func (sh *ServerHandler) hGroup(w http.ResponseWriter, r *http.Request) {
 // @Produce     json
 // @Success     200 {object} response — данные успешно сохранены
 // @Failure     400 {object} response — неверный формат запроса
+// @Failure     403 {object} response — не админ
 // @Failure     409 {object} response — имя уже занято
 // @Failure     500 {object} response — внутренняя ошибка сервера
 // @Router      /solution [post]
 func (sh *ServerHandler) hSolution(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	u := entity.User{}
 	userID, err := sh.IsAuthenticated(w, r)
 	if err != nil {
 		sh.respond(w, r, http.StatusUnauthorized, nil)
 		return
 	}
+
+	u.UserID = userID
+
+	if ok := sh.s.GetAdmin(&u); !ok {
+		sh.respond(w, r, http.StatusForbidden, nil)
+		return
+	}
+
 	c := &entity.Solution{
-		UserID: userID,
+		UserID: u.UserID,
 	}
 
 	defer r.Body.Close()

@@ -38,6 +38,10 @@ func (s *Memory) SaveSolution(context.Context, *entity.Solution) error {
 	return status.Errorf(codes.Unimplemented, "method SaveSolution not implemented")
 }
 
+func (s *Memory) GetAdmin(*entity.User) bool {
+	return false
+}
+
 func (s *Memory) GroupList(context.Context) (*entity.GroupList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }

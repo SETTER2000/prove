@@ -143,6 +143,7 @@ func (i *InSQL) SaveSolution(ctx context.Context, c *entity.Solution) error {
 	if err != nil {
 		log.Printf("error uuid %s: %s", c.TaskID, err.Error())
 	}
+
 	err = i.w.db.QueryRow(
 		"INSERT INTO public.solution(description, task_id, encrypted_solution, uploaded_at) VALUES ($1,$2,$3,now()) RETURNING solution_id",
 		c.Description,
@@ -269,6 +270,32 @@ func (i *InSQL) Get(ctx context.Context, sh *entity.Prove) (*entity.Prove, error
 	sh.Del = del
 
 	return sh, nil
+}
+
+// GetAdmin вернёт nil, если пользователь является админом.
+// Админом является тот кто первый зарегистрировался.
+func (i *InSQL) GetAdmin(u *entity.User) bool {
+	var id string
+	rows, err := i.r.db.Query("SELECT user_id FROM public.\"user\" ORDER BY uploaded_at LIMIT 1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if u.UserID == id {
+		return true
+	}
+	return false
 }
 
 func (i *InSQL) GetByLogin(ctx context.Context, l string) (*entity.Authentication, error) {

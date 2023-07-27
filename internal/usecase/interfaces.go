@@ -21,6 +21,8 @@ type (
 		SaveTask(context.Context, *entity.Task) error
 		TaskList(context.Context) (*entity.TaskList, error)
 		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.SolutionList, error)
+		GetAdmin(*entity.User) bool
+
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
@@ -41,6 +43,8 @@ type (
 		SaveTask(context.Context, *entity.Task) error
 		TaskList(context.Context) (*entity.TaskList, error)
 		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.SolutionList, error)
+		GetAdmin(*entity.User) bool
+
 		SaveText(context.Context, *entity.Text) error
 		SavePass(context.Context, *entity.Pass) error
 		SaveCard(context.Context, *entity.Card) error
