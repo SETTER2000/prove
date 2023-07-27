@@ -414,6 +414,37 @@ func (i *InSQL) Balance(ctx context.Context) (*entity.Balance, error) {
 
 	return &b, nil
 }
+
+// BalanceAdd пополнить баланс
+func (i *InSQL) BalanceAdd(ctx context.Context, s *entity.Balance) error {
+	tx, err := i.w.db.Begin()
+	if err != nil {
+		log.Printf("%e", err)
+	}
+	ct := context.Background()
+	defer tx.Rollback()
+	sl := &entity.SolutionData{
+		UserID: entity.UserID(s.UserID),
+	}
+	credit, err := i.GetBalance(ctx, sl)
+	if err != nil {
+		log.Printf("error GetBalance(ctx, s): %s", err.Error())
+		return er.ErrBadRequest
+	}
+
+	stmt, err := tx.PrepareContext(ct, "UPDATE balance SET credit=$1 WHERE user_id=$2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	crd := credit + float64(s.Current)
+	if _, err = stmt.Exec(&crd, s.UserID); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
 func (i *InSQL) GetByLogin(ctx context.Context, l string) (*entity.Authentication, error) {
 	var a entity.Authentication
 	var userID, login, encrypt string
@@ -689,49 +720,6 @@ CREATE TABLE IF NOT EXISTS public.balance
     credit           NUMERIC(9,2)   NOT NULL DEFAULT 0.01,
     uploaded_at 	TIMESTAMP(0) WITH TIME ZONE,
     user_id         uuid,
-    FOREIGN KEY (user_id) REFERENCES public."user" (user_id)
-        MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-CREATE TABLE IF NOT EXISTS public.cash
-(
-    cash_id     UUID NOT NULL DEFAULT uuid_generate_v1(),
-    CONSTRAINT 	cash_id_cash PRIMARY KEY (cash_id),
-    price       MONEY 	NOT NULL,
-    uploaded_at 		TIMESTAMP(0) WITH TIME ZONE
-);
-
-CREATE TABLE IF NOT EXISTS cash_task (
-  	cash_id     UUID REFERENCES cash (cash_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	task_id 	UUID REFERENCES task (task_id) ON UPDATE CASCADE,
-	amount      numeric NOT NULL DEFAULT 1,
-	CONSTRAINT cash_task_pkey PRIMARY KEY (cash_id, task_id)
-);
-
-
-CREATE TABLE IF NOT EXISTS public.ball
-(
-    ball_id         UUID NOT NULL DEFAULT uuid_generate_v1(),
-    CONSTRAINT 	ball_id_ball PRIMARY KEY (ball_id),
-    price           MONEY   NOT NULL,
-    uploaded_at 	TIMESTAMP(0) WITH TIME ZONE
-);
-
-CREATE TABLE IF NOT EXISTS task_user (
-  	user_id     UUID REFERENCES "user" (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	task_id 	UUID REFERENCES task (task_id) ON UPDATE CASCADE,
-	amount      numeric NOT NULL DEFAULT 1,
-	CONSTRAINT user_task_pkey PRIMARY KEY (user_id, task_id)
-);
-
-CREATE TABLE IF NOT EXISTS public.pass
-(
-    login       VARCHAR(100) NOT NULL,
-    password    VARCHAR(100) NOT NULL,
-    user_id     uuid,
-    uploaded_at TIMESTAMP(0) WITH TIME ZONE,
-    meta_data   VARCHAR,
-    CONSTRAINT key_primary_unique
-        PRIMARY KEY (login, password, user_id),
     FOREIGN KEY (user_id) REFERENCES public."user" (user_id)
         MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );

@@ -134,7 +134,9 @@ func (uc *ProveUseCase) SaveCard(ctx context.Context, c *entity.Card) error {
 	return nil
 }
 func (uc *ProveUseCase) Register(ctx context.Context, auth *entity.Authentication) error {
-	//auth.Login = ctx.Value(auth.Cookie.AccessTokenName).(string)
+	if !scripts.IsValidUUID(auth.GroupID) {
+		return er.ErrUUID
+	}
 	err := uc.repo.Registry(ctx, auth)
 	if err != nil {
 		return err
@@ -144,6 +146,11 @@ func (uc *ProveUseCase) Register(ctx context.Context, auth *entity.Authenticatio
 
 // GetSolution вернёт решение задачи
 func (uc *ProveUseCase) GetSolution(ctx context.Context, s *entity.SolutionData) error {
+
+	if !scripts.IsValidUUID(s.TaskID) {
+		return er.ErrUUID
+	}
+
 	_, err := uc.repo.GetBalance(ctx, s)
 	if err != nil {
 		log.Printf("error, user credit exhausted: %s", err.Error())
@@ -180,6 +187,17 @@ func (uc *ProveUseCase) GetBalance(ctx context.Context, s *entity.SolutionData) 
 	}
 
 	return r, nil
+}
+
+// BalanceAdd пополнить баланс
+func (uc *ProveUseCase) BalanceAdd(ctx context.Context, s *entity.Balance) error {
+	err := uc.repo.BalanceAdd(ctx, s)
+	if err != nil {
+		log.Printf("error, user credit exhausted: %s", err.Error())
+		return er.ErrBadRequest
+	}
+
+	return nil
 }
 
 // ShortLink принимает короткий URL и возвращает длинный (GET /api/{key})

@@ -23,6 +23,8 @@ type (
 		GetSolution(context.Context, *entity.SolutionData) error
 		GetBalance(context.Context, *entity.SolutionData) (float64, error)
 		FindBalance(ctx context.Context) (*entity.Balance, error)
+		BalanceAdd(context.Context, *entity.Balance) error
+
 		GetAdmin(*entity.User) bool
 
 		SaveText(context.Context, *entity.Text) error
@@ -48,6 +50,8 @@ type (
 		GetSolution(context.Context, *entity.SolutionData) error
 		GetBalance(context.Context, *entity.SolutionData) (float64, error)
 		Balance(context.Context) (*entity.Balance, error)
+		BalanceAdd(context.Context, *entity.Balance) error
+
 		GetAdmin(*entity.User) bool
 
 		SaveText(context.Context, *entity.Text) error

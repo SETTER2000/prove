@@ -79,6 +79,14 @@ GET http://localhost:8080/ping
 Возможно получить ответ на задачу пока ваш кредит не достиг 1000 
 * GET {{dmain}}/user/balance
 
+### Пополнить баланс
+* POST {{dmain}}/user/balance
+```azure
+{
+    "current":100.30
+}
+```
+
 ### Создать задачу
 * POST {{domain}}/task
 ```azure

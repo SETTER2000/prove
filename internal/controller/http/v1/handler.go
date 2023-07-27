@@ -83,6 +83,7 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 		h.Route("/user", func(r chi.Router) {
 			r.Post("/register", sh.handleUserCreate)
 			r.Post("/login", sh.handleUserLogin)
+			r.Post("/balance", sh.hBalanceAdd)
 			r.Get("/balance", sh.hBalance)
 		})
 	}
@@ -122,6 +123,45 @@ func (sh *ServerHandler) hBalance(w http.ResponseWriter, r *http.Request) {
 	sh.respond(w, r, http.StatusOK, b)
 }
 
+// @Summary     Return JSON
+// @Description Пополнение текущего баланса пользователя
+// @ID          handleUserBalanceGet
+// @Tags  	    gofermart
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — успешная обработка запроса
+// @Failure     401 {object} response — пользователь не аутентифицирован
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /user/balance [post]
+func (sh *ServerHandler) hBalanceAdd(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	userID, err := sh.IsAuthenticated(w, r)
+	if err != nil {
+		sh.respond(w, r, http.StatusUnauthorized, nil)
+		return
+	}
+
+	c := &entity.Balance{
+		UserID: userID,
+	}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &c); err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	err = sh.s.BalanceAdd(ctx, c)
+	if err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+	}
+
+	sh.respond(w, r, http.StatusOK, nil)
+}
+
 // @Summary     Return JSON empty
 // @Description Save data task
 // @ID          Получить решение задачи.
@@ -153,6 +193,7 @@ func (sh *ServerHandler) hTaskSolution(w http.ResponseWriter, r *http.Request) {
 		sh.error(w, r, http.StatusBadRequest, err)
 		return
 	}
+
 	err = sh.s.GetSolution(ctx, c)
 	if err != nil {
 		if errors.Is(err, er.ErrAlreadyExists) {

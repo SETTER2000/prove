@@ -236,6 +236,11 @@ func (i *InFiles) GroupList(context.Context) (*entity.GroupList, error) {
 func (i *InFiles) Balance(ctx context.Context) (*entity.Balance, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }
+
+func (i *InFiles) BalanceAdd(context.Context, *entity.Balance) error {
+	return status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+
 func (i *InFiles) SaveTask(ctx context.Context, c *entity.Task) error {
 	return status.Errorf(codes.Unimplemented, "method SaveGroup not implemented")
 }

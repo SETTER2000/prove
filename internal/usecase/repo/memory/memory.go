@@ -52,6 +52,10 @@ func (s *Memory) GetBalance(context.Context, *entity.SolutionData) (float64, err
 func (s *Memory) Balance(ctx context.Context) (*entity.Balance, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }
+
+func (s *Memory) BalanceAdd(context.Context, *entity.Balance) error {
+	return status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
 func (s *Memory) GroupList(context.Context) (*entity.GroupList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }

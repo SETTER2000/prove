@@ -34,6 +34,7 @@ var (
 	ErrBadFormatOrder           = errors.New("invalid order number format")
 	ErrIncorrectLoginOrPass     = errors.New("incorrect login or password")
 	ErrIncorrectToken           = errors.New("incorrect token, the token is rotten")
+	ErrUUID                     = errors.New("id uuid should be")
 )
 
 type response struct {
