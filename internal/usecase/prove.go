@@ -6,6 +6,8 @@ import (
 	"github.com/SETTER2000/prove/config"
 	"github.com/SETTER2000/prove/internal/entity"
 	"github.com/SETTER2000/prove/pkg/er"
+	"github.com/SETTER2000/prove/scripts"
+	"log"
 )
 
 var (
@@ -140,6 +142,46 @@ func (uc *ProveUseCase) Register(ctx context.Context, auth *entity.Authenticatio
 	return nil
 }
 
+// GetSolution вернёт решение задачи
+func (uc *ProveUseCase) GetSolution(ctx context.Context, s *entity.SolutionData) error {
+	_, err := uc.repo.GetBalance(ctx, s)
+	if err != nil {
+		log.Printf("error, user credit exhausted: %s", err.Error())
+		return er.ErrBadRequest
+	}
+
+	uc.repo.GetSolution(ctx, s)
+	solution, err := scripts.FindAllMissingNumbers(s.Data)
+	if err != nil {
+		return er.ErrBadRequest
+	} else {
+		s.Solution = solution
+	}
+
+	return nil
+}
+
+// FindBalance получение текущего баланса пользователя
+func (uc *ProveUseCase) FindBalance(ctx context.Context) (*entity.Balance, error) {
+	b, err := uc.repo.Balance(ctx)
+	if err == nil {
+		return b, nil
+	}
+	return nil, ErrBadRequest
+}
+
+// GetBalance получить информацию о кредитоспособности,
+// если вернёт err!=nil - кредит исчерпан
+func (uc *ProveUseCase) GetBalance(ctx context.Context, s *entity.SolutionData) (float64, error) {
+	r, err := uc.repo.GetBalance(ctx, s)
+	if err != nil {
+		log.Printf("error, user credit exhausted: %s", err.Error())
+		return 0, er.ErrBadRequest
+	}
+
+	return r, nil
+}
+
 // ShortLink принимает короткий URL и возвращает длинный (GET /api/{key})
 func (uc *ProveUseCase) ShortLink(ctx context.Context, ind *entity.Prove) (*entity.Prove, error) {
 	ind.Config = config.GetConfig()
@@ -165,7 +207,7 @@ func (uc *ProveUseCase) CardListUserID(ctx context.Context, u *entity.User) (*en
 }
 
 // TaskKey возвращает ответ по задаче
-func (uc *ProveUseCase) TaskKey(ctx context.Context, u *entity.User, t *entity.Task) (*entity.SolutionList, error) {
+func (uc *ProveUseCase) TaskKey(ctx context.Context, u *entity.User, t *entity.Task) (*entity.Task, error) {
 
 	ol, err := uc.repo.TaskKey(ctx, u, t)
 	if err == nil {

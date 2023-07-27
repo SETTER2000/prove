@@ -220,10 +220,20 @@ func (i *InFiles) SaveGroup(ctx context.Context, c *entity.Group) error {
 func (i *InFiles) GetAdmin(*entity.User) bool {
 	return false
 }
+func (i *InFiles) GetSolution(context.Context, *entity.SolutionData) error {
+	return status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+
+func (i *InFiles) GetBalance(context.Context, *entity.SolutionData) (float64, error) {
+	return 0, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
 func (i *InFiles) SaveSolution(context.Context, *entity.Solution) error {
 	return status.Errorf(codes.Unimplemented, "method SaveSolution not implemented")
 }
 func (i *InFiles) GroupList(context.Context) (*entity.GroupList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
+}
+func (i *InFiles) Balance(ctx context.Context) (*entity.Balance, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }
 func (i *InFiles) SaveTask(ctx context.Context, c *entity.Task) error {
@@ -232,7 +242,7 @@ func (i *InFiles) SaveTask(ctx context.Context, c *entity.Task) error {
 func (i *InFiles) TaskList(context.Context) (*entity.TaskList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GroupList not implemented")
 }
-func (i *InFiles) TaskKey(context.Context, *entity.User, *entity.Task) (*entity.SolutionList, error) {
+func (i *InFiles) TaskKey(context.Context, *entity.User, *entity.Task) (*entity.Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TaskKey not implemented")
 }
 func (i *InFiles) SaveCard(context.Context, *entity.Card) error {

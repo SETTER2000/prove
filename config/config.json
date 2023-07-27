@@ -8,7 +8,6 @@
     "trusted_subnet": "10.0.0.1/8",
     "resolve_ip_using_header": false,
     "base_url": "http://localhost:8080",
-    "accrual": "http://localhost:8088",
     "server_address": "localhost:8080",
     "server_domain": "rooder.ru",
     "certs_dir": "certs"

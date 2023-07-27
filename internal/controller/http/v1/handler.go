@@ -12,6 +12,7 @@ import (
 	"github.com/SETTER2000/prove/pkg/log/logger"
 	"github.com/SETTER2000/prove/pkg/middleware/encrypt"
 	"github.com/SETTER2000/prove/pkg/middleware/gzip"
+	"github.com/SETTER2000/prove/scripts"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -71,7 +72,8 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 		h.Post("/group", sh.hGroup)
 		h.Get("/group", sh.hGroups)
 		h.Post("/task", sh.hTask)
-		h.Get("/task/{key}", sh.hTask)
+		h.Post("/task/solution", sh.hTaskSolution)
+		h.Get("/task/{key}", sh.hTaskKey)
 		h.Get("/task", sh.hTasks)
 		h.Post("/solution", sh.hSolution)
 
@@ -81,6 +83,7 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 		h.Route("/user", func(r chi.Router) {
 			r.Post("/register", sh.handleUserCreate)
 			r.Post("/login", sh.handleUserLogin)
+			r.Get("/balance", sh.hBalance)
 		})
 	}
 
@@ -90,6 +93,77 @@ func (sh *ServerHandler) InitRoutes() *chi.Mux {
 	}
 
 	return router
+}
+
+// @Summary     Return JSON
+// @Description Получение текущего баланса пользователя
+// @ID          handleUserBalanceGet
+// @Tags  	    gofermart
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — успешная обработка запроса
+// @Failure     401 {object} response — пользователь не аутентифицирован
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /user/balance [get]
+func (sh *ServerHandler) hBalance(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	_, err := sh.IsAuthenticated(w, r)
+	if err != nil {
+		sh.respond(w, r, http.StatusUnauthorized, nil)
+		return
+	}
+
+	b, err := sh.s.FindBalance(ctx)
+	if err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+	}
+
+	sh.respond(w, r, http.StatusOK, b)
+}
+
+// @Summary     Return JSON empty
+// @Description Save data task
+// @ID          Получить решение задачи.
+// @Tags  	    prove
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} response — данные успешно сохранены
+// @Failure     400 {object} response — неверный формат запроса
+// @Failure     409 {object} response — имя уже занято
+// @Failure     500 {object} response — внутренняя ошибка сервера
+// @Router      /task/solution [post]
+func (sh *ServerHandler) hTaskSolution(w http.ResponseWriter, r *http.Request) {
+	userID, err := sh.IsAuthenticated(w, r)
+	if err != nil {
+		sh.respond(w, r, http.StatusUnauthorized, nil)
+		return
+	}
+
+	ctx := r.Context()
+	c := &entity.SolutionData{
+		UserID: entity.UserID(userID),
+	}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(body, &c); err != nil {
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+	err = sh.s.GetSolution(ctx, c)
+	if err != nil {
+		if errors.Is(err, er.ErrAlreadyExists) {
+			sh.error(w, r, http.StatusConflict, err)
+			return
+		}
+		sh.error(w, r, http.StatusBadRequest, err)
+		return
+	}
+
+	sh.respond(w, r, http.StatusOK, c)
 }
 
 // @Summary     Return JSON empty
@@ -504,9 +578,14 @@ func (sh *ServerHandler) hTaskKey(w http.ResponseWriter, r *http.Request) {
 		sh.respond(w, r, http.StatusUnauthorized, nil)
 		return
 	}
+	key := chi.URLParam(r, "key")
+	if !scripts.IsValidUUID(key) {
+		sh.respond(w, r, http.StatusBadRequest, "id uuid should be")
+		return
+	}
 
 	data := entity.Task{
-		TaskID: chi.URLParam(r, "key"),
+		TaskID: key,
 	}
 
 	u.UserID = userID

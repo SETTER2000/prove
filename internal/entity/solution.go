@@ -15,6 +15,13 @@ type (
 		UserID      string `json:"user_id,omitempty"`
 		UploadedAt  string `json:"created,omitempty"`
 	}
+
+	SolutionData struct {
+		UserID   `json:"-"`
+		TaskID   string `json:"task_id" validate:"required"`
+		Data     []int  `json:"data" validate:"required"`
+		Solution []int  `json:"result"`
+	}
 )
 
 func (c *Solution) Validate() error {

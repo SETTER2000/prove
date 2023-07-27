@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/SETTER2000/prove/config"
 	"github.com/SETTER2000/prove/internal/entity"
@@ -14,10 +15,12 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
+	"strconv"
 )
 
 const (
 	driverName = "pgx"
+	maxCredit  = 1000.00
 )
 
 type (
@@ -80,6 +83,18 @@ func (i *InSQL) Registry(ctx context.Context, a *entity.Authentication) error {
 			log.Printf("error registration: %s", err.Message)
 			return er.ErrBadRequest
 		}
+	}
+
+	// Balance initialization
+	var credit string
+	err = i.w.db.QueryRow(
+		"INSERT INTO public.balance(user_id, uploaded_at) VALUES ($1,now()) RETURNING credit",
+		a.ID,
+	).Scan(&credit)
+
+	if err != nil {
+		log.Printf("error registration: %s", err)
+		return er.ErrBadRequest
 	}
 	return nil
 }
@@ -298,6 +313,107 @@ func (i *InSQL) GetAdmin(u *entity.User) bool {
 	return false
 }
 
+// GetSolution обновление баланса пользователя по его id
+func (i *InSQL) GetSolution(ctx context.Context, s *entity.SolutionData) error {
+	tx, err := i.w.db.Begin()
+	if err != nil {
+		log.Printf("%e", err)
+	}
+	ct := context.Background()
+	defer tx.Rollback()
+
+	credit, err := i.GetBalance(ctx, s)
+	if err != nil {
+		log.Printf("error GetBalance(ctx, s): %s", err.Error())
+		return er.ErrBadRequest
+	}
+	u := entity.User{
+		UserID: string(s.UserID),
+	}
+	t := entity.Task{
+		TaskID: s.TaskID,
+	}
+	task, err := i.TaskKey(ctx, &u, &t)
+	if err != nil {
+		log.Printf("error, TaskKey(ctx, &u, &t): %s", err.Error())
+		return er.ErrBadRequest
+	}
+	f, err := strconv.ParseFloat(task.Price, 64)
+	if err != nil {
+		log.Printf("error Atoi %s\n", err)
+	}
+
+	stmt, err := tx.PrepareContext(ct, "UPDATE balance SET credit=$1 WHERE user_id=$2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	crd := credit + f
+	if _, err = stmt.Exec(&crd, s.UserID); err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+// GetBalance получить информацию о кредитоспособности,
+// если вернёт err!=nil - кредит исчерпан
+func (i *InSQL) GetBalance(ctx context.Context, u *entity.SolutionData) (float64, error) {
+	var credit float64
+
+	rows, err := i.w.db.Query("SELECT credit FROM balance WHERE user_id = $1 AND credit <= $2 GROUP BY credit", u.UserID, maxCredit)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&credit)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if credit < 1000 && credit > 0 {
+		if credit == 0.01 {
+			credit = 0
+		}
+		return credit, nil
+	}
+
+	return 0, fmt.Errorf("exceeded credit")
+}
+
+// Balance получение текущего баланса пользователя
+func (i *InSQL) Balance(ctx context.Context) (*entity.Balance, error) {
+	var credit sql.NullFloat64
+
+	q := `SELECT credit FROM public."balance" WHERE user_id=$1`
+
+	rows, err := i.w.db.Queryx(q, ctx.Value(i.cfg.Cookie.AccessTokenName).(string))
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	b := entity.Balance{}
+	for rows.Next() {
+		err = rows.Scan(&credit)
+		if err != nil {
+			return nil, err
+		}
+		b.Current = float32(credit.Float64)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &b, nil
+}
 func (i *InSQL) GetByLogin(ctx context.Context, l string) (*entity.Authentication, error) {
 	var a entity.Authentication
 	var userID, login, encrypt string
@@ -427,36 +543,35 @@ func (i *InSQL) TaskList(ctx context.Context) (*entity.TaskList, error) {
 	return &or, nil
 }
 
-// TaskKey вернуть ответ по задаче
-func (i *InSQL) TaskKey(ctx context.Context, u *entity.User, t *entity.Task) (*entity.SolutionList, error) {
-	var solution, taskID, solutionID string
-
-	q := `SELECT encrypted_solution, task_id, solution_id FROM "solution" WHERE task_id=$1 ORDER BY LIMIT 1`
+// TaskKey вернуть одну задачу
+func (i *InSQL) TaskKey(ctx context.Context, u *entity.User, t *entity.Task) (*entity.Task, error) {
+	var taskID, taskName, description, price, uploadedAt string
+	q := `SELECT task_id, task_name,description,  price, uploaded_at FROM task WHERE task_id=$1`
 	rows, err := i.w.db.Queryx(q, t.TaskID)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
 
-	sl := entity.SolutionList{}
-	s := entity.Solution{}
+	s := &entity.Task{}
 	for rows.Next() {
-		err = rows.Scan(&solution, &taskID, &solutionID)
+		err = rows.Scan(&taskID, &taskName, &description, &price, &uploadedAt)
 		if err != nil {
 			return nil, err
 		}
-		//
-		s.Solution = solution
-		s.TaskID = taskID
-		s.SolutionID = solutionID
-		sl = append(sl, s)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return &sl, nil
+	s.TaskID = t.TaskID
+	s.TaskName = taskName
+	s.Description = description
+	s.Price = price
+	s.UploadedAt = uploadedAt
+
+	return s, nil
 }
 
 // CardListGetUserID  вернуть список карт по UserID
@@ -551,7 +666,7 @@ CREATE TABLE IF NOT EXISTS public.task
     CONSTRAINT task_id_task PRIMARY KEY (task_id),
     task_name   		VARCHAR(100) NOT NULL UNIQUE,
     description TEXT 	NOT NULL,
-    price        		NUMERIC NOT NULL DEFAULT 0,
+    price        		NUMERIC(9,2) NOT NULL DEFAULT 0,
     uploaded_at 		TIMESTAMP(0) WITH TIME ZONE
 );
 
@@ -567,7 +682,16 @@ CREATE TABLE IF NOT EXISTS public.solution
     uploaded_at      TIMESTAMP(0) WITH TIME ZONE
 );
 
-
+CREATE TABLE IF NOT EXISTS public.balance
+(
+    balance_id      UUID NOT NULL DEFAULT uuid_generate_v1(),
+    CONSTRAINT 	    balance_id_balance PRIMARY KEY (balance_id),
+    credit           NUMERIC(9,2)   NOT NULL DEFAULT 0.01,
+    uploaded_at 	TIMESTAMP(0) WITH TIME ZONE,
+    user_id         uuid,
+    FOREIGN KEY (user_id) REFERENCES public."user" (user_id)
+        MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
 CREATE TABLE IF NOT EXISTS public.cash
 (
     cash_id     UUID NOT NULL DEFAULT uuid_generate_v1(),

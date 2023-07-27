@@ -13,14 +13,16 @@ import (
 
 type (
 	// Prove -.
-	// Post -.
 	Prove interface {
 		SaveSolution(context.Context, *entity.Solution) error
 		SaveGroup(context.Context, *entity.Group) error
 		GroupList(context.Context) (*entity.GroupList, error)
 		SaveTask(context.Context, *entity.Task) error
 		TaskList(context.Context) (*entity.TaskList, error)
-		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.SolutionList, error)
+		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.Task, error)
+		GetSolution(context.Context, *entity.SolutionData) error
+		GetBalance(context.Context, *entity.SolutionData) (float64, error)
+		FindBalance(ctx context.Context) (*entity.Balance, error)
 		GetAdmin(*entity.User) bool
 
 		SaveText(context.Context, *entity.Text) error
@@ -42,7 +44,10 @@ type (
 		GroupList(context.Context) (*entity.GroupList, error)
 		SaveTask(context.Context, *entity.Task) error
 		TaskList(context.Context) (*entity.TaskList, error)
-		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.SolutionList, error)
+		TaskKey(context.Context, *entity.User, *entity.Task) (*entity.Task, error)
+		GetSolution(context.Context, *entity.SolutionData) error
+		GetBalance(context.Context, *entity.SolutionData) (float64, error)
+		Balance(context.Context) (*entity.Balance, error)
 		GetAdmin(*entity.User) bool
 
 		SaveText(context.Context, *entity.Text) error

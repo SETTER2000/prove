@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/SETTER2000/prove/config"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/acme/autocert"
 	"hash/fnv"
 	"math/rand"
@@ -79,16 +80,27 @@ func CheckEnvironFlag(environName string, flagName string) bool {
 	return true
 }
 
-//func TrimEmpty(s string) (string, error) {
-//	sz := len(s)
-//	var word string
-//	for i := 0; i < sz; i++ {
-//		if string(s[i]) != " " {
-//			word += string(s[i])
-//		}
-//	}
-//	return word, nil
-//}
+// IsValidUUID проверить валидный UUID или нет
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
+}
+func FindAllMissingNumbers(ar []int) ([]int, error) {
+	var res []int
+	if len(ar) < 1 {
+		return nil, fmt.Errorf("error, argument cannot be len: %d", len(ar))
+	}
+	registry := make([]int, len(ar))
+	for i, v := range ar {
+		registry[v] = i
+	}
+	for i := 0; i < len(registry); i++ {
+		if registry[i] == 0 {
+			res = append(res, i)
+		}
+	}
+	return res[1:], nil
+}
 
 // Trim удаляет первый и последний символ в строке s
 // t - удаляется символ переданный в аргумент
