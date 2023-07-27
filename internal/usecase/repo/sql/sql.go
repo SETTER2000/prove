@@ -396,7 +396,7 @@ func (i *InSQL) Balance(ctx context.Context) (*entity.Balance, error) {
 
 	q := `SELECT credit FROM public."balance" WHERE user_id=$1`
 
-	rows, err := i.w.db.Queryx(q, ctx.Value(i.cfg.Cookie.AccessTokenName).(string))
+	rows, err := i.w.db.Queryx(q, ctx.Value(i.cfg.AccessTokenName).(string))
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
