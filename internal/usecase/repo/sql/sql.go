@@ -349,6 +349,9 @@ func (i *InSQL) GetSolution(ctx context.Context, s *entity.SolutionData) error {
 	}
 	defer stmt.Close()
 	crd := credit + f
+	if crd > maxCredit {
+		return er.ErrBadRequest
+	}
 	if _, err = stmt.Exec(&crd, s.UserID); err != nil {
 		return err
 	}
@@ -361,7 +364,7 @@ func (i *InSQL) GetSolution(ctx context.Context, s *entity.SolutionData) error {
 func (i *InSQL) GetBalance(ctx context.Context, u *entity.SolutionData) (float64, error) {
 	var credit float64
 
-	rows, err := i.w.db.Query("SELECT credit FROM balance WHERE user_id = $1 AND credit <= $2 GROUP BY credit", u.UserID, maxCredit)
+	rows, err := i.w.db.Query("SELECT credit FROM balance WHERE user_id = $1 ", u.UserID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -377,7 +380,7 @@ func (i *InSQL) GetBalance(ctx context.Context, u *entity.SolutionData) (float64
 		log.Fatal(err)
 	}
 
-	if credit < 1000 && credit > 0 {
+	if credit <= maxCredit && credit > 0 {
 		if credit == 0.01 {
 			credit = 0
 		}
@@ -438,9 +441,11 @@ func (i *InSQL) BalanceAdd(ctx context.Context, s *entity.Balance) error {
 	}
 	defer stmt.Close()
 
-	crd := credit + float64(s.Current)
-	if _, err = stmt.Exec(&crd, s.UserID); err != nil {
-		return err
+	crd := credit - float64(s.Current)
+	if crd > 0.01 {
+		if _, err = stmt.Exec(&crd, s.UserID); err != nil {
+			return err
+		}
 	}
 	return tx.Commit()
 }

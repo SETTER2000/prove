@@ -151,13 +151,11 @@ func (uc *ProveUseCase) GetSolution(ctx context.Context, s *entity.SolutionData)
 		return er.ErrUUID
 	}
 
-	_, err := uc.repo.GetBalance(ctx, s)
+	err := uc.repo.GetSolution(ctx, s)
 	if err != nil {
 		log.Printf("error, user credit exhausted: %s", err.Error())
 		return er.ErrBadRequest
 	}
-
-	uc.repo.GetSolution(ctx, s)
 	solution, err := scripts.FindAllMissingNumbers(s.Data)
 	if err != nil {
 		return er.ErrBadRequest
