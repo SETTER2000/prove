@@ -34,7 +34,7 @@ GET http://localhost:8080/ping
 
 ### Создание группы
 
-* POST {{dmain}}/group 201
+* POST {{domain}}/group 201
 Добавить уникальное название группы
 ```azure
 {
