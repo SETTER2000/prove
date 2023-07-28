@@ -52,8 +52,8 @@ GET http://localhost:8080/ping
 
 Создание нового студента, используя его ФИО и т.д. 
 
-<em>Обязательно указать group_id, можно посмотреть получив список всех групп.</em>
-* POST {{dmain}}/user/register 201
+<em>Обязательно указать group_id (можно посмотреть получив список всех групп).</em>
+* POST {{domain}}/user/register 201
 ```azure
 {
     "email": "bob@mail.ru",
@@ -77,10 +77,10 @@ GET http://localhost:8080/ping
 
 ### Текущий кредит
 Возможно получить ответ на задачу пока ваш кредит не достиг 1000 
-* GET {{dmain}}/user/balance
+* GET {{domain}}/user/balance
 
 ### Пополнить баланс
-* POST {{dmain}}/user/balance
+* POST {{domain}}/user/balance
 ```azure
 {
     "current":100.30
@@ -124,7 +124,7 @@ response:
 }
 ```
 ### Получить ответ по задачи
-* POST {{dmain}}/task/solution
+* POST {{domain}}/task/solution
 
 ```azure
 {
