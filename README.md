@@ -37,6 +37,19 @@ GET http://localhost:8080/ping
 200 Ok
 500 Error
 
+## Adminer
+Вход в админер http://rooder.ru:8077:
+* Движок: PostgreSQL
+* Сервер: postgres
+* Имя пользователя: bob
+* Пароль: mypasswd
+* База данных: prove
+
+
+```azure
+http://rooder.ru:8077
+```
+
 ## API
 * {{port}} = :8080
 * {{domain}} = http://localhost{{port}}/api
