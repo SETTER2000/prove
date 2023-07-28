@@ -15,6 +15,9 @@ Prove - REST API сервис предоставляет решения алго
  prove_<version> -d <DSN>
 ```
 
+* Можно подключиться к DB сейчас так, например в windows:
+* <binary_name>.exe -d postgres://bob:mypasswd@194.67.104.167:5432/prove?sslmode=disable
+
 Подключить DB через переменную окружения
 ```
 DATABASE_URI=<DSN> 

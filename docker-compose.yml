@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=mypasswd
       - POSTGRES_DB=prove
     ports:
-      - "5435:5432"
+      - "5432:5432"
     volumes:
       - ./db/data:/var/lib/postgresql/data
     networks:
@@ -28,12 +28,12 @@ services:
   prove:
     image: setter2000/prove:0.5.0
     environment:
-      DATABASE_URI: "postgres://bob:mypasswd@db:5432/prove?sslmode=disable"
+      DATABASE_URI: "postgres://bob:mypasswd@postgres:5432/prove?sslmode=disable"
     container_name: "prove"
     command: ./prove
     ports:
-      - "8080:8080"
-#      - "443:443"
+#      - "8080:8080"
+      - "443:443"
     restart: always
     networks:
       - mynet
