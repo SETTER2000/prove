@@ -19,8 +19,8 @@ type (
 	SolutionData struct {
 		UserID   `json:"-"`
 		TaskID   string `json:"task_id" validate:"required"`
-		Data     []int  `json:"data" validate:"required"`
-		Solution []int  `json:"result"`
+		Data     `json:"data" validate:"required"`
+		Solution []int `json:"result"`
 	}
 )
 

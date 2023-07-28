@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/SETTER2000/prove/config"
 	"github.com/SETTER2000/prove/internal/entity"
+	"github.com/SETTER2000/prove/internal/usecase/services"
 	"github.com/SETTER2000/prove/pkg/er"
 	"github.com/SETTER2000/prove/scripts"
 	"log"
@@ -156,9 +157,9 @@ func (uc *ProveUseCase) GetSolution(ctx context.Context, s *entity.SolutionData)
 		log.Printf("error, user credit exhausted: %s", err.Error())
 		return err
 	}
-	solution, err := scripts.FindAllMissingNumbers(s.Data)
+	solution, err := services.FindAllMissingNumbers(&s.Data)
 	if err != nil {
-		return er.ErrBadRequest
+		return err
 	} else {
 		s.Solution = solution
 	}

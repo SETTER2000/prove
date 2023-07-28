@@ -45,8 +45,7 @@ COVER_OUT=profiles/coverage.out
 BAKING="-X 'github.com/SETTER2000/prove/internal/app.OSString=`go env GOOS`' -X 'github.com/SETTER2000/prove/internal/app.archString=`go env GOARCH`' -X 'github.com/SETTER2000/prove/internal/app.dateString=`date`' -X 'github.com/SETTER2000/prove/internal/app.versionString=`git describe --tags`' -X 'github.com/SETTER2000/prove/internal/app.commitString=`git rev-parse HEAD`'"
 
 # Подключение к базе данных
-#DB=postgres://bob:Bob-2023@194.67.104.167:5432/prove?sslmode=disable
-#DB=postgres://bob:Bob2023@postgres:5433/prove?sslmode=disable
+#DB=postgres://bob:mypasswd@194.67.104.167:5432/prove?sslmode=disable
 DB=postgres://prove:DBprove_2023@127.0.0.1:5432/prove?sslmode=disable
 
 

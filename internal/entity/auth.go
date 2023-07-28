@@ -21,7 +21,7 @@ type (
 		GroupID         string `json:"group_id"`
 	}
 
-	Data struct{}
+	//Data struct{}
 )
 
 func (a *Authentication) Validate() error {

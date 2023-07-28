@@ -186,6 +186,7 @@ func (sh *ServerHandler) hTaskSolution(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
+
 	if err != nil {
 		panic(err)
 	}
@@ -204,7 +205,7 @@ func (sh *ServerHandler) hTaskSolution(w http.ResponseWriter, r *http.Request) {
 			sh.error(w, r, http.StatusForbidden, err)
 			return
 		}
-		sh.error(w, r, http.StatusBadRequest, err)
+		sh.error(w, r, http.StatusInternalServerError, err)
 		return
 	}
 
