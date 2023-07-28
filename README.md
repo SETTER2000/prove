@@ -22,6 +22,14 @@ Prove - REST API сервис предоставляет решения алго
 ```
 DATABASE_URI=<DSN> 
 ```
+Подключить DB в конфиге (наверно сейчас для проверки самый оптимальный вариант)
+1. Создать папку config рядом с бинарником (бинарники здесь https://github.com/SETTER2000/prove/bin)
+2. Скачать конфиг файл https://github.com/SETTER2000/prove/config/config.json в папку config
+3. И в конфиге установить DSN для DB
+```azure
+"connect_db": "postgres://bob:mypasswd@194.67.104.167:5432/prove?sslmode=disable"
+```
+
 
 Проверка работы DB
 
